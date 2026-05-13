@@ -179,3 +179,121 @@ def test_validate_exe_only_zip_fails_when_exe_missing(tmp_path) -> None:
         zf.writestr("readme.txt", b"oops, no exe")
     with pytest.raises(UpdatePackageError):
         _validate_update_zip(z, "MyTool.exe", expected_internal=False)
+
+
+# ─── Phase 3A: regression for the incomplete-download bug ────────────────────
+
+def test_incomplete_download_raises_clean_runtime_error(tmp_path, monkeypatch) -> None:
+    """Regression for the Phase 3A bug.
+
+    When the server reports Content-Length larger than the bytes actually
+    delivered, ``download_and_apply`` must raise a ``RuntimeError`` whose
+    message contains both the captured-actual size and the expected total.
+    Before the fix, ``tmp_zip.stat().st_size`` was evaluated AFTER
+    ``tmp_zip.unlink()`` which raced the deletion and raised
+    ``FileNotFoundError``, masking the real cause. The fix captures
+    ``actual_size`` before the unlink call.
+    """
+    import os
+    import sys
+    import phoenix_commons.updater.installer as installer
+    from phoenix_commons.updater import UpdateInfo, download_and_apply
+
+    # download_and_apply early-exits when not frozen — pretend we are.
+    monkeypatch.setattr(sys, "frozen", True, raising=False)
+    fake_exe = tmp_path / "fake.exe"
+    monkeypatch.setattr(sys, "executable", str(fake_exe))
+
+    EXPECTED_TOTAL = 1000
+    ACTUAL_BYTES = b"x" * 100  # Server lies about Content-Length
+
+    class _FakeResponse:
+        headers = {"Content-Length": str(EXPECTED_TOTAL)}
+
+        def __init__(self) -> None:
+            self._pos = 0
+
+        def read(self, chunk: int) -> bytes:
+            if self._pos >= len(ACTUAL_BYTES):
+                return b""
+            block = ACTUAL_BYTES[self._pos : self._pos + chunk]
+            self._pos += len(block)
+            return block
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            return False
+
+    def fake_urlopen(req, timeout=60):
+        return _FakeResponse()
+
+    monkeypatch.setattr(installer.urllib.request, "urlopen", fake_urlopen)
+
+    # Use a known temp path so we can assert cleanup happened
+    known_zip = tmp_path / "predictable.zip"
+
+    def fake_mkstemp(suffix: str = ".zip"):
+        fd = os.open(str(known_zip), os.O_CREAT | os.O_RDWR)
+        return (fd, str(known_zip))
+
+    monkeypatch.setattr(installer.tempfile, "mkstemp", fake_mkstemp)
+
+    info = UpdateInfo(
+        current_version="1.0.0",
+        latest_version="1.1.0",
+        download_url="https://example.com/test.zip",
+        release_notes="",
+    )
+
+    with pytest.raises(RuntimeError) as exc_info:
+        download_and_apply(info, "MyTool.exe", expected_internal=False)
+
+    msg = str(exc_info.value)
+
+    # The friendly "Download incomplete" path, NOT a leaked FileNotFoundError
+    assert "Download incomplete" in msg, (
+        f"Expected 'Download incomplete' in message, got: {msg!r}"
+    )
+
+    # Both byte counts must be present
+    assert str(len(ACTUAL_BYTES)) in msg, (
+        f"Expected actual size {len(ACTUAL_BYTES)} in message, got: {msg!r}"
+    )
+    assert str(EXPECTED_TOTAL) in msg, (
+        f"Expected total size {EXPECTED_TOTAL} in message, got: {msg!r}"
+    )
+
+    # Explicit anti-regression: the original bug surfaced as FileNotFoundError
+    assert not isinstance(exc_info.value, FileNotFoundError), (
+        "FileNotFoundError leaked instead of the friendly RuntimeError. "
+        "The fix's actual_size capture must happen BEFORE tmp_zip.unlink()."
+    )
+
+    # And the temp zip must have been cleaned up
+    assert not known_zip.exists(), (
+        f"Temp zip should have been removed after the failure: {known_zip}"
+    )
+
+
+# ─── Phase 3A: PowerShell-safe quoting helper ───────────────────────────────
+
+def test_ps_literal_simple() -> None:
+    """_ps_literal wraps plain strings in single quotes."""
+    from phoenix_commons.updater.installer import _ps_literal
+    assert _ps_literal("simple") == "'simple'"
+    assert _ps_literal("") == "''"
+
+
+def test_ps_literal_escapes_internal_single_quotes() -> None:
+    """PowerShell convention: single quote inside a single-quoted string is
+    doubled. Protects exe-only batch generation when a path or exe name
+    happens to contain an apostrophe."""
+    from phoenix_commons.updater.installer import _ps_literal
+    assert _ps_literal("with'quote") == "'with''quote'"
+    assert _ps_literal("two'with'quotes") == "'two''with''quotes'"
+    # And a realistic Windows path with an apostrophe (rare but legal)
+    assert _ps_literal(r"C:\Users\justing's tool\app.exe") == (
+        "'C:\\Users\\justing''s tool\\app.exe'"
+    )

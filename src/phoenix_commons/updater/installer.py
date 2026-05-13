@@ -196,9 +196,19 @@ def _build_exe_only_batch(
     exe_name: str,
 ) -> str:
     """Batch + inline PowerShell that waits for the parent, extracts only
-    ``<exe_name>`` from the zip over the existing exe, then relaunches."""
+    ``<exe_name>`` from the zip over the existing exe, then relaunches.
+
+    The three PowerShell string arguments (zip path, exe path, exe name) use
+    :func:`_ps_literal` so values containing a single quote can't terminate
+    the PS string and break the script. The ``del`` and ``start`` lines below
+    the ``powershell`` invocation are cmd.exe-level — they keep their plain
+    double-quoted form, which handles Windows paths with spaces.
+    """
     zip_str = str(zip_path)
     exe_str = str(exe_path)
+    ps_zip = _ps_literal(zip_path)
+    ps_exe = _ps_literal(exe_path)
+    ps_exe_name = _ps_literal(exe_name)
     return f"""@echo off
 :wait
 tasklist /FI "PID eq {pid}" 2>nul | find "{pid}" >nul
@@ -206,7 +216,7 @@ if not errorlevel 1 (
     timeout /t 1 /nobreak >nul
     goto wait
 )
-powershell -ExecutionPolicy Bypass -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [System.IO.Compression.ZipFile]::OpenRead('{zip_str}'); $entry = $zip.Entries | Where-Object {{ $_.Name -eq '{exe_name}' }} | Select-Object -First 1; if ($entry) {{ [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, '{exe_str}', $true) }}; $zip.Dispose()"
+powershell -ExecutionPolicy Bypass -Command "Add-Type -AssemblyName System.IO.Compression.FileSystem; $zip = [System.IO.Compression.ZipFile]::OpenRead({ps_zip}); $entry = $zip.Entries | Where-Object {{ $_.Name -eq {ps_exe_name} }} | Select-Object -First 1; if ($entry) {{ [System.IO.Compression.ZipFileExtensions]::ExtractToFile($entry, {ps_exe}, $true) }}; $zip.Dispose()"
 del "{zip_str}"
 start "" "{exe_str}"
 del "%~f0"
@@ -269,9 +279,13 @@ def download_and_apply(
                         progress_callback(done, total)
 
         if total > 0 and tmp_zip.stat().st_size < total:
+            # Capture the size BEFORE unlinking — otherwise the stat() in
+            # the error message would race the deletion and raise
+            # FileNotFoundError, masking the real "incomplete download" cause.
+            actual_size = tmp_zip.stat().st_size
             tmp_zip.unlink(missing_ok=True)
             raise RuntimeError(
-                f"Download incomplete: got {tmp_zip.stat().st_size} of "
+                f"Download incomplete: got {actual_size} of "
                 f"{total} bytes.\nPlease try again or download manually "
                 "from GitHub."
             )
