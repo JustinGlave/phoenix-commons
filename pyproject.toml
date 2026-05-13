@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "phoenix-commons"
+description = "Shared design system, widgets, auto-updater, and utilities for the Phoenix Controls family of PySide6 desktop tools."
+readme = "README.md"
+authors = [{ name = "Justin Glave" }]
+requires-python = ">=3.10"
+dynamic = ["version"]
+dependencies = [
+    "PySide6>=6.5",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest>=7",
+]
+
+[project.urls]
+Homepage = "https://github.com/JustinGlave/phoenix-commons"
+
+[tool.setuptools.dynamic]
+version = { attr = "phoenix_commons._version.__version__" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+# Phase 2 will add phoenix_style.qss under phoenix_commons/theme/.
+# Declare it ahead of time so the package picks it up on install.
+[tool.setuptools.package-data]
+"phoenix_commons.theme" = ["*.qss"]

@@ -1,0 +1,191 @@
+============================================================
+PHOENIX CONTROLS — GUI/UX STARTER PROMPT
+Copy and paste this entire block at the start of a new Claude session.
+============================================================
+
+We are building a PySide6 desktop app for Phoenix Controls / ATS Inc.
+It must follow the Phoenix Controls Unified Design System exactly as
+implemented in an existing reference project. Everything below is the
+source of truth — apply it without deviation.
+
+------------------------------------------------------------
+TECH STACK
+------------------------------------------------------------
+- Python 3.12+, PySide6
+- PyInstaller --onedir for distribution
+- QSettings("ATS Inc", "<AppName>") for persistence
+- Dark navy theme only (no light mode toggle needed unless asked)
+
+------------------------------------------------------------
+COLOR PALETTE (design tokens)
+------------------------------------------------------------
+Background:       #0a0e27  (navy, main window + dialogs)
+Surface:          #141829  (inputs, table cells, tab pane)
+Surface deep:     #050810  (status bar, spinbox buttons)
+Border:           #2d3748  (all borders and dividers)
+Text primary:     #ffffff
+Text secondary:   #d1d5db
+Text muted:       #9ca3af
+
+Primary (red):    #dc2626  hover #b91c1c  pressed #991b1b
+Secondary (blue): #1e3a8a  hover #1e40af
+Highlight:        #3b82f6  (focus rings, links, selected tabs)
+Success (green):  #10b981  (Pass badge, checked checkboxes)
+Error (red):      #ef4444  (Fail badge)
+Warning (amber):  #f59e0b  (archived badge text)
+
+------------------------------------------------------------
+STYLESHEET LOADING PATTERN
+------------------------------------------------------------
+Load phoenix_style.qss via _resource_path at app startup.
+Always include a full embedded fallback string (_EMBEDDED_QSS)
+so that auto-updates (which only replace the .exe, not _internal/)
+still get correct styling. Pattern:
+
+    qss_path = _resource_path("phoenix_style.qss")
+    if os.path.exists(qss_path):
+        with open(qss_path, "r") as fh:
+            app.setStyleSheet(fh.read())
+    else:
+        app.setStyleSheet(_EMBEDDED_QSS)
+
+_resource_path resolves to sys._MEIPASS when frozen (PyInstaller),
+or the script directory in dev:
+
+    def _resource_path(filename: str) -> str:
+        if getattr(sys, "frozen", False):
+            base = Path(getattr(sys, "_MEIPASS", ""))
+        else:
+            base = Path(__file__).parent
+        return str(base / filename)
+
+The QSS file is at:
+    C:\Users\justing\PycharmProjects\Phoenix-Checkout-Tool\phoenix_style.qss
+Copy it into every new project and add it to build.bat:
+    --add-data="phoenix_style.qss;."
+
+------------------------------------------------------------
+COMPONENT HELPER CLASSES  (paste near top of main .py file)
+------------------------------------------------------------
+These must be used instead of raw QPushButton / QTableWidget.
+
+    class PrimaryButton(QPushButton):
+        """Red primary-action button."""
+        def __init__(self, text: str, parent=None):
+            super().__init__(text, parent)
+            self.setMinimumHeight(36)
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    class SecondaryButton(QPushButton):
+        """Blue secondary-action button."""
+        def __init__(self, text: str, parent=None):
+            super().__init__(text, parent)
+            self.setObjectName("secondaryButton")
+            self.setMinimumHeight(36)
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    class TertiaryButton(QPushButton):
+        """Outline low-emphasis button."""
+        def __init__(self, text: str, parent=None):
+            super().__init__(text, parent)
+            self.setObjectName("tertiaryButton")
+            self.setMinimumHeight(36)
+            self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+    class PhoenixTable(QTableWidget):
+        """Read-only data table with Phoenix styling defaults."""
+        def __init__(self, rows: int, cols: int, parent=None):
+            super().__init__(rows, cols, parent)
+            self.verticalHeader().setVisible(False)
+            self.setEditTriggers(QTableWidget.EditTrigger.NoEditTriggers)
+            self.setSelectionMode(QTableWidget.SelectionMode.NoSelection)
+            self.setFocusPolicy(Qt.FocusPolicy.NoFocus)
+            self.setAlternatingRowColors(True)
+
+------------------------------------------------------------
+BUTTON USAGE RULES
+------------------------------------------------------------
+PrimaryButton   — main / destructive actions (Save, Submit, New, Delete)
+SecondaryButton — supporting actions (Export, Batch Add, Check All, Close)
+TertiaryButton  — low-emphasis / cancel / dismiss (Cancel, What's New, ✕)
+
+Special buttons that have their own QSS objectName (do NOT use helpers):
+  - "Install & Restart"  → setObjectName("InstallBtn")
+  - "Restore Job"        → setObjectName("RestoreBtn")
+
+------------------------------------------------------------
+OBJECTNAME CONVENTIONS  (QSS targets these by name)
+------------------------------------------------------------
+Panels / cards:       widget.setObjectName("Panel")        → dark rounded card
+Stat cards:           widget.setObjectName("StatCard")     → same as Panel
+Page title:           label.setObjectName("ProjectTitle")  → 14pt bold white
+Page subtitle:        label.setObjectName("ProjectSubtitle") → 10pt muted
+Section title:        label.setObjectName("SectionTitle")  → 12pt semibold
+Pass badge:           label.setObjectName("PassBadge")     → green pill
+Fail badge:           label.setObjectName("FailBadge")     → red pill
+Archived badge:       label.setObjectName("ArchivedBadge") → amber pill
+Step badge:           label.setObjectName("StepBadge")     → blue circle
+Tag preview:          label.setObjectName("TagPreview")    → blue 10pt
+Row separator:        widget.setObjectName("RowSep")       → subtle divider
+Update banner:        widget.setObjectName("UpdateBanner")
+Update message:       label.setObjectName("UpdateMsg")
+
+Dynamic badge refresh pattern (for PASS/FAIL state changes):
+    label.setObjectName("PassBadge")   # or "FailBadge" or ""
+    label.style().unpolish(label)
+    label.style().polish(label)
+
+------------------------------------------------------------
+LAYOUT RULES  (8px grid)
+------------------------------------------------------------
+Main window content margins:  16px all sides
+Spacing between major sections: 16px
+Spacing within a section:     8px
+Spacing within a form row:    6-8px
+Button minimum height:        36px
+Input minimum height:         36px (via QSS padding)
+Table row height (data rows): 42px
+
+Always use QHBoxLayout / QVBoxLayout. Never use absolute positioning.
+Use addStretch() to push content; use setSpacing() and setContentsMargins()
+explicitly — never rely on Qt defaults.
+
+------------------------------------------------------------
+TYPOGRAPHY
+------------------------------------------------------------
+Font family: "Segoe UI", Arial, sans-serif (set globally in QSS)
+Base size:   11pt
+
+ProjectTitle:   14pt, weight 700
+SectionTitle:   12pt, weight 600
+Body:           11pt, weight 400
+Subtitle/muted: 10pt, color #9ca3af
+Hint:            9pt, color #9ca3af
+
+------------------------------------------------------------
+CHECKBOXES
+------------------------------------------------------------
+Checked state is green (#10b981) — handled by QSS automatically.
+No inline setStyleSheet needed.
+
+------------------------------------------------------------
+INLINE setStyleSheet RULES
+------------------------------------------------------------
+Never use setStyleSheet() on individual widgets for colors, fonts,
+or borders that are already in the QSS.
+The only acceptable inline styles are for dynamic per-item colors
+that cannot be expressed with objectName (e.g. tree item foreground
+set via QBrush, not stylesheet).
+
+------------------------------------------------------------
+REFERENCE FILES (on this machine)
+------------------------------------------------------------
+QSS file:        C:\Users\justing\PycharmProjects\Phoenix-Checkout-Tool\phoenix_style.qss
+Embedded QSS:    C:\Users\justing\PycharmProjects\Phoenix-Checkout-Tool\checkout_tool_gui.py
+                 (search for _EMBEDDED_QSS — copy the full string)
+Working example: C:\Users\justing\PycharmProjects\Phoenix-Checkout-Tool\checkout_tool_gui.py
+Design docs:     C:\Users\justing\PycharmProjects\Design Items\Phoenix_Tool_Design_V1\
+
+============================================================
+END OF STARTER PROMPT
+============================================================

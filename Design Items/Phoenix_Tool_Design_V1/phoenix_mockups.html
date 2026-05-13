@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phoenix Controls - Unified Design System Mockups</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #050810;
+            color: #ffffff;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-align: center;
+            background: linear-gradient(135deg, #dc2626, #1e3a8a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .mockup-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 60px;
+        }
+
+        @media (max-width: 1200px) {
+            .mockup-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .mockup-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mockup {
+            background: #0a0e27;
+            border: 1px solid #2d3748;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .mockup:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 30px 60px rgba(220, 38, 38, 0.2);
+        }
+
+        .menubar {
+            background: #0a0e27;
+            border-bottom: 1px solid #2d3748;
+            padding: 8px 16px;
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+        }
+
+        .menubar-item {
+            color: #d1d5db;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .menubar-item:hover {
+            color: #3b82f6;
+        }
+
+        .header {
+            background: #141829;
+            border-bottom: 1px solid #2d3748;
+            padding: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .header-icon {
+            width: 24px;
+            height: 24px;
+            background: #1e3a8a;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .control-btn {
+            width: 28px;
+            height: 28px;
+            background: transparent;
+            border: none;
+            color: #9ca3af;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .control-btn:hover {
+            color: #3b82f6;
+        }
+
+        .content {
+            padding: 24px;
+            background: #0a0e27;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            color: #ffffff;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #d1d5db;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        .input, .select {
+            width: 100%;
+            background: #141829;
+            border: 1px solid #2d3748;
+            border-radius: 6px;
+            padding: 10px 12px;
+            color: #ffffff;
+            font-size: 13px;
+            font-family: "Segoe UI", sans-serif;
+        }
+
+        .input:focus, .select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        .input::placeholder {
+            color: #9ca3af;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 8px;
+            margin: 12px 0;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        .btn-primary:hover {
+            background: #b91c1c;
+        }
+
+        .btn-secondary {
+            background: #1e3a8a;
+            color: #ffffff;
+        }
+
+        .btn-secondary:hover {
+            background: #1e40af;
+        }
+
+        .btn-tertiary {
+            background: transparent;
+            border: 1px solid #4b5563;
+            color: #3b82f6;
+        }
+
+        .btn-tertiary:hover {
+            background: #1f2937;
+            border-color: #3b82f6;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .table th {
+            background: #050810;
+            color: #e5e7eb;
+            padding: 10px 12px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 1px solid #2d3748;
+        }
+
+        .table td {
+            background: #141829;
+            color: #ffffff;
+            padding: 10px 12px;
+            border-bottom: 1px solid #2d3748;
+        }
+
+        .table tr:hover td {
+            background: #1f2937;
+        }
+
+        .table tr:nth-child(even) td {
+            background: #0f1219;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: #10b981;
+            color: #ffffff;
+        }
+
+        .badge-warning {
+            background: #f59e0b;
+            color: #ffffff;
+        }
+
+        .badge-error {
+            background: #ef4444;
+            color: #ffffff;
+        }
+
+        .spacer {
+            height: 8px;
+        }
+
+        .mockup-title {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
+            font-weight: 600;
+            color: #d1d5db;
+        }
+
+        .description {
+            text-align: center;
+            font-size: 13px;
+            color: #9ca3af;
+            margin-top: 8px;
+        }
+
+        .color-palette {
+            margin-top: 60px;
+            padding: 40px;
+            background: #141829;
+            border-radius: 8px;
+            border: 1px solid #2d3748;
+        }
+
+        .palette-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 30px;
+            color: #ffffff;
+        }
+
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .color-item {
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #2d3748;
+        }
+
+        .color-swatch {
+            height: 100px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .color-info {
+            background: #050810;
+            padding: 12px;
+            font-size: 12px;
+        }
+
+        .color-name {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .color-hex {
+            color: #9ca3af;
+            font-family: monospace;
+        }
+
+        .section-divider {
+            height: 1px;
+            background: #2d3748;
+            margin: 16px 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Phoenix Controls Unified Design System</h1>
+
+        <div class="mockup-grid">
+            <!-- Tool 1: Model Decoder -->
+            <div class="mockup">
+                <div class="menubar">
+                    <span class="menubar-item">File</span>
+                    <span class="menubar-item">Edit</span>
+                    <span class="menubar-item">View</span>
+                    <span class="menubar-item">Tools</span>
+                    <span class="menubar-item">Help</span>
+                </div>
+                <div class="header">
+                    <div class="header-title">
+                        <div class="header-icon">⚙</div>
+                        Model Number Decoder
+                    </div>
+                    <div class="header-controls">
+                        <button class="control-btn">−</button>
+                        <button class="control-btn">□</button>
+                        <button class="control-btn">✕</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="section-title">Decode Model Number</div>
+                    
+                    <div class="form-group">
+                        <label class="label">Model Number</label>
+                        <input type="text" class="input" placeholder="e.g., CELX-4-R-12">
+                    </div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary">Decode</button>
+                        <button class="btn btn-secondary">Clear</button>
+                        <button class="btn btn-tertiary">Help</button>
+                    </div>
+
+                    <div class="section-divider"></div>
+                    <div class="section-title">Model Components</div>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Component</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Series</td>
+                                <td><span class="badge badge-success">CELERIS</span></td>
+                            </tr>
+                            <tr>
+                                <td>Size</td>
+                                <td>4"</td>
+                            </tr>
+                            <tr>
+                                <td>Valve Type</td>
+                                <td>Relief</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mockup-title">Model Number Decoder</div>
+                <div class="description">Decode and analyze Phoenix model numbers</div>
+            </div>
+
+            <!-- Tool 2: Project Manager -->
+            <div class="mockup">
+                <div class="menubar">
+                    <span class="menubar-item">File</span>
+                    <span class="menubar-item">Edit</span>
+                    <span class="menubar-item">View</span>
+                    <span class="menubar-item">Tools</span>
+                    <span class="menubar-item">Help</span>
+                </div>
+                <div class="header">
+                    <div class="header-title">
+                        <div class="header-icon">📋</div>
+                        Project Manager
+                    </div>
+                    <div class="header-controls">
+                        <button class="control-btn">−</button>
+                        <button class="control-btn">□</button>
+                        <button class="control-btn">✕</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="section-title">Projects</div>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary">+ New Project</button>
+                    </div>
+
+                    <div class="form-group">
+                        <input type="text" class="input" placeholder="Search projects...">
+                    </div>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Project Name</th>
+                                <th>Status</th>
+                                <th>Manager</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>HVAC System A</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>John Smith</td>
+                            </tr>
+                            <tr>
+                                <td>Lab Ventilation</td>
+                                <td><span class="badge badge-warning">Pending</span></td>
+                                <td>Sarah Jones</td>
+                            </tr>
+                            <tr>
+                                <td>Retrofit Project</td>
+                                <td><span class="badge badge-success">Active</span></td>
+                                <td>Mike Brown</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="mockup-title">Project Manager</div>
+                <div class="description">Track and manage Phoenix control projects</div>
+            </div>
+
+            <!-- Tool 3: Checkout -->
+            <div class="mockup">
+                <div class="menubar">
+                    <span class="menubar-item">File</span>
+                    <span class="menubar-item">Edit</span>
+                    <span class="menubar-item">View</span>
+                    <span class="menubar-item">Tools</span>
+                    <span class="menubar-item">Help</span>
+                </div>
+                <div class="header">
+                    <div class="header-title">
+                        <div class="header-icon">🛒</div>
+                        Checkout & Documentation
+                    </div>
+                    <div class="header-controls">
+                        <button class="control-btn">−</button>
+                        <button class="control-btn">□</button>
+                        <button class="control-btn">✕</button>
+                    </div>
+                </div>
+                <div class="content">
+                    <div class="section-title">Order Details</div>
+
+                    <div class="form-group">
+                        <label class="label">Purchase Order</label>
+                        <input type="text" class="input" placeholder="PO-XXXX-XXXX">
+                    </div>
+
+                    <div class="section-divider"></div>
+                    <div class="section-title">Items</div>
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Qty</th>
+                                <th>Total</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Venturi Valve</td>
+                                <td>2</td>
+                                <td>$300.00</td>
+                            </tr>
+                            <tr>
+                                <td>Control Module</td>
+                                <td>1</td>
+                                <td>$150.00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <div class="button-group">
+                        <button class="btn btn-primary">Generate PDF</button>
+                        <button class="btn btn-secondary">Save</button>
+                    </div>
+                </div>
+                <div class="mockup-title">Checkout & Documentation</div>
+                <div class="description">Manage orders and generate documentation</div>
+            </div>
+        </div>
+
+        <!-- Color Palette Reference -->
+        <div class="color-palette">
+            <div class="palette-title">Color Palette</div>
+            
+            <div class="color-grid">
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #dc2626;">Primary Red</div>
+                    <div class="color-info">
+                        <div class="color-name">Phoenix Red</div>
+                        <div class="color-hex">#dc2626</div>
+                    </div>
+                </div>
+
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #1e3a8a;">Dark Blue</div>
+                    <div class="color-info">
+                        <div class="color-name">Secondary Action</div>
+                        <div class="color-hex">#1e3a8a</div>
+                    </div>
+                </div>
+
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #3b82f6;">Bright Blue</div>
+                    <div class="color-info">
+                        <div class="color-name">Focus/Highlight</div>
+                        <div class="color-hex">#3b82f6</div>
+                    </div>
+                </div>
+
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #10b981;">Success Green</div>
+                    <div class="color-info">
+                        <div class="color-name">Success State</div>
+                        <div class="color-hex">#10b981</div>
+                    </div>
+                </div>
+
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #f59e0b;">Warning Amber</div>
+                    <div class="color-info">
+                        <div class="color-name">Warning State</div>
+                        <div class="color-hex">#f59e0b</div>
+                    </div>
+                </div>
+
+                <div class="color-item">
+                    <div class="color-swatch" style="background: #141829;">Surface</div>
+                    <div class="color-info">
+                        <div class="color-name">Card Background</div>
+                        <div class="color-hex">#141829</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</body>
+</html>
