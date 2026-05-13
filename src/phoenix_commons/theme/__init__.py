@@ -1,6 +1,9 @@
 """Theme — Phoenix design system loader.
 
-Phase 2 will populate this with `apply_dark_theme(app)`, `phoenix_style.qss`,
-and the embedded-QSS fallback string. Ported from
-`Phoenix_CAD_Tool/ui/style.py:21-829`.
+Public API:
+    apply_dark_theme(app: QApplication) -> None
 """
+
+from phoenix_commons.theme.apply import apply_dark_theme
+
+__all__ = ["apply_dark_theme"]
