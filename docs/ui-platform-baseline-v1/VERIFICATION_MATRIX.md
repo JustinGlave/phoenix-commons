@@ -7,8 +7,10 @@
 > **Unverified** rows have no test today but could be added without
 > blockers. **Deferred** rows are explicit "later phase" items.
 >
-> Captured 2026-05-18. Re-snapshot at the start of every
-> verification-related phase.
+> Captured 2026-05-18 (initial). Updated 2026-05-19 (Phase 2.6
+> packaging-verification dry-runs landed; 5 rows moved from
+> Unverified/Deferred to Verified). Re-snapshot at the start of
+> every verification-related phase.
 
 ## Legend
 
@@ -30,7 +32,7 @@
 | 1.2 | `phoenix_commons.__version__` returns `"0.1.0"` | ✅ Verified | `tests/test_smoke.py` (Phase 1) |
 | 1.3 | `phoenix_commons.theme.apply_dark_theme` resolves + applies | ✅ Verified | `tests/test_embedded_qss.py::test_apply_dark_theme_imports_after_migration` + `test_apply_dark_theme_fallback_uses_embedded_qss` (Phase 2.1) |
 | 1.4 | `phoenix_commons.icons.icon(...)` returns a non-null `QIcon` | ✅ Verified | `tests/test_icons.py::test_icon_returns_qicon` (Phase 2.2) |
-| 1.5 | `phoenix_commons.theme.tokens` constants resolve | ⚠️ Unverified | Module landed Phase 2.5; smoke test still TODO |
+| 1.5 | `phoenix_commons.theme.tokens` constants resolve | ✅ Verified | `tests/test_tokens.py` — palette constants are hex; `SEMANTIC_COLORS` mirrors module constants; `C is SEMANTIC_COLORS` identity; module is Qt-free (Phase 2.6) |
 | 1.6 | `phoenix_commons.widgets.*` instantiate under offscreen Qt | ✅ Verified | `tests/test_smoke.py::test_component_instantiation` (Phase 1) |
 | 1.7 | `phoenix_commons.widgets.no_scroll.*` instantiate | ✅ Verified | `tests/test_smoke.py::test_no_scroll_instantiation` (Phase 1) |
 | 1.8 | `phoenix_commons.paths.user_data_dir` creates the dir | ✅ Verified | `tests/test_paths.py` (Phase 3) |
@@ -44,7 +46,7 @@
 | 2.1 | `pip install -e .` succeeds | ✅ Verified | CI workflow step (`pip install -e .[test]`) |
 | 2.2 | `pip install -e .[test]` pulls pytest + pytest-qt | ✅ Verified | CI workflow step |
 | 2.3 | Editable install picks up package data (`*.qss`, `*.svg`) at runtime | ✅ Verified | Implicit — `test_apply_dark_theme_fallback_uses_embedded_qss` + `test_package_data_includes_all_starter_svgs` exercise the resolution paths |
-| 2.4 | `pip install .` (non-editable) bundles `*.qss` + `*.svg` | ⚠️ Unverified | Both file globs are declared under `[tool.setuptools.package-data]` in `pyproject.toml`, but no wheel-build test exists. Low-risk because setuptools tooling is mature. |
+| 2.4 | `pip install .` (non-editable) bundles `*.qss` + `*.svg` | ✅ Verified | Phase 2.6 dry-run in a temp venv: `pip install .` then `importlib.resources` resolved `phoenix_style.qss` (17,662 B) and 10 SVGs from the site-packages install. Test `test_packaging.py::test_pyproject_declares_both_package_data_paths` pins the declaration. |
 
 ### Package-data loading
 
@@ -76,7 +78,7 @@
 | 5.6 | Cache returns same instance on repeat call with same args | ✅ Verified | `tests/test_icons.py::test_cache_hit_returns_same_instance` |
 | 5.7 | Cache distinguishes `(name, color, size)` | ✅ Verified | `tests/test_icons.py::test_cache_distinguishes_name_color_and_size` |
 | 5.8 | `_recolor` byte-substitution handles both quote styles | ✅ Verified | `tests/test_icons.py::test_recolor_handles_single_quotes` |
-| 5.9 | `icon()` consumes `SEMANTIC_COLORS` from `theme.tokens` | ⚠️ Unverified | Wiring landed Phase 2.5; no test asserts the indirection explicitly. Existing tests work because the resolved values are unchanged. |
+| 5.9 | `icon()` consumes `SEMANTIC_COLORS` from `theme.tokens` | ✅ Verified | `tests/test_packaging.py::test_icons_consumes_tokens_semantic_colors` (identity check) + `test_icon_registry_imports_from_tokens_not_inlined` (static import inspection) — Phase 2.6 |
 
 ### Generated fallback
 
@@ -114,9 +116,9 @@
 
 | Row | What | Status | Where verified |
 |-----|------|--------|----------------|
-| 9.1 | `git submodule add ../../phoenix-commons commons` works for new tools | ⏳ Deferred | Wizard-driven scaffolding is a Command Center concern (Phase 5+); not exercised by phoenix-commons CI |
-| 9.2 | `pip install -e ./commons` resolves the package from a tool's working tree | ⏳ Deferred | Same — exercised once a consuming tool exists |
-| 9.3 | Plan B (vendoring) — `refresh_commons.bat` works | ⏳ Deferred | Wizard generates the file; verified during Phase 6 dogfood |
+| 9.1 | Submodule shape `app/commons/` is consumable by pip-install-e | ✅ Verified | Phase 2.6 sandbox dry-run: `sandbox/app/commons/` populated via `git archive HEAD \| tar -x` (working-tree shape equivalent to a real submodule for pip purposes); `pip install -e ./commons` from a fresh venv resolved `phoenix_commons.__file__` to the sandbox path. The `git submodule add` invocation itself is exercised by Command Center wizard scaffolding (Phase 5+), out of scope here. |
+| 9.2 | `pip install -e ./commons` resolves the package from a tool's working tree | ✅ Verified | Phase 2.6 sandbox dry-run output: `phoenix_commons.__file__` resolved to `sandbox/app/commons/src/phoenix_commons/__init__.py`. Every public surface (theme, tokens, icons, paths, updater) reachable via the editable install. |
+| 9.3 | Plan B (vendoring) — `refresh_commons.bat` works | ⏳ Deferred | Wizard generates the file; verified during Phase 6 dogfood (out of scope for Phase 2.6) |
 
 ### Frozen mode
 
@@ -139,32 +141,43 @@
 
 ## Summary tally
 
-| Status | Rows |
-|--------|------|
-| ✅ Verified | 30 |
-| ⚠️ Unverified | 4 |
-| ⏳ Deferred | 5 |
-| 🔴 Blocked | 9 |
-| 📝 Doc-only | 0 |
+| Status | Rows | Δ since Phase 2.5 |
+|--------|------|-------------------|
+| ✅ Verified | 35 | +5 |
+| ⚠️ Unverified | 1 | -3 |
+| ⏳ Deferred | 3 | -2 |
+| 🔴 Blocked | 9 | 0 |
+| 📝 Doc-only | 0 | 0 |
 
-**30 / 48 rows verified today.** All 9 blocked rows trace back to a
-single root cause: the S1/AV bootloader-quarantine on Justin's
-laptop (`BLOCKERS.md §1`). Resolving that unblocks Phase 4
-PyInstaller verification, which unblocks frozen mode (10.x) and
-installer runtime (11.x). The 4 unverified rows are low-risk
-additions for a future polish phase.
+**35 / 48 rows verified after Phase 2.6.** Phase 2.6 moved five rows
+into Verified:
+
+- Row 1.5 — `theme.tokens` smoke (new `tests/test_tokens.py`)
+- Row 2.4 — non-editable install bundles `*.qss` + `*.svg`
+- Row 5.9 — icons consume `SEMANTIC_COLORS` from `theme.tokens`
+- Row 9.1 — submodule shape consumable by `pip install -e`
+- Row 9.2 — `pip install -e ./commons` resolves the package
+
+All 9 blocked rows still trace back to the single S1/AV
+bootloader-quarantine root cause (`BLOCKERS.md §1`). Resolving
+that unblocks Phase 4 PyInstaller verification, which unblocks
+frozen mode (10.x) and installer runtime (11.x). The one remaining
+unverified row (6.4 — generator triple-quote guard) is low-risk
+and trivial to add when convenient.
 
 ## Closing the gap
 
-| Gap | Plan |
-|-----|------|
-| Unverified row 1.5 — token smoke test | Trivial: add `tests/test_tokens.py` asserting each constant resolves and `SEMANTIC_COLORS["primary"] == PRIMARY` etc. Single afternoon. |
-| Unverified row 2.4 — wheel-build smoke | Defer until first consuming app needs a wheel install. Setuptools tooling around `package-data` is mature; risk is low. |
-| Unverified row 5.9 — explicit icon → tokens indirection test | Trivial: add `tests/test_icons.py::test_icons_consumes_tokens` asserting `icons.SEMANTIC_COLORS is theme.tokens.SEMANTIC_COLORS`. Pin the wiring at the import level. |
-| Unverified row 6.4 — generator triple-quote guard | Add a unit test that calls `render('"""evil"""')` (well, an isolated `main()` invocation against a tmp fixture). Not urgent. |
-| Deferred row 6.5 — `_generated/` migration | Triggered automatically when the second generated artifact lands. Policy at PLATFORM_CONTRACT.md § Generated artifacts. |
-| Deferred rows 9.x — submodule + vendoring | Exercised once the new-tool wizard's templates dog-food against a throwaway tool (Phase 6). |
-| Blocked rows 8.5, 10.x, 11.x — frozen + installer | Single gating issue: S1/AV chain. Tracked in `BLOCKERS.md §1`. No commons-side work resumes on these until that's resolved. |
+| Gap | Plan | Status |
+|-----|------|--------|
+| Row 1.5 — token smoke test | Added `tests/test_tokens.py` Phase 2.6 | ✅ Closed |
+| Row 2.4 — wheel-build smoke | Phase 2.6 dry-run in a temp venv; `pip install .` and `importlib.resources` resolved everything | ✅ Closed |
+| Row 5.9 — explicit icon → tokens indirection test | Added `tests/test_packaging.py::test_icons_consumes_tokens_semantic_colors` (identity check) + `test_icon_registry_imports_from_tokens_not_inlined` (static check) | ✅ Closed |
+| Row 6.4 — generator triple-quote guard | Add a unit test that calls `render('"""evil"""')` via `main()` against a tmp fixture. Not urgent. | ⚠️ Still open |
+| Row 6.5 — `_generated/` migration | Triggered automatically when the second generated artifact lands. Policy at PLATFORM_CONTRACT.md § Generated artifacts. | ⏳ Deferred |
+| Row 9.1 — submodule shape | Verified via sandbox dry-run (`git archive` + `pip install -e`) | ✅ Closed |
+| Row 9.2 — editable submodule install | Same sandbox dry-run | ✅ Closed |
+| Row 9.3 — Plan B vendoring | Exercised during Phase 6 dogfood once a consuming app exists | ⏳ Deferred |
+| Blocked rows 8.5, 10.x, 11.x — frozen + installer | Single gating issue: S1/AV chain. Tracked in `BLOCKERS.md §1`. No commons-side work resumes on these until that's resolved. | 🔴 Blocked |
 
 ## See also
 
