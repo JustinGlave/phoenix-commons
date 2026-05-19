@@ -114,6 +114,19 @@
 | Consequences | Build tail is now one line instead of an embedded multi-line script. Helper is testable in isolation (3 pytest cases + 5 CLI scenarios). Replicated into every wizard-scaffolded tool. |
 | Cross-reference | `phoenix-commons/docs/rollout/phase-6a-build-template-fix-report.md` |
 
+### ADR-014: Canonical platform Python version = 3.12
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-16 (UI Platform Stabilization 01) |
+| Status | Finalized |
+| Context | Earlier rollout work used Python 3.14 on Justin's developer laptop because that's what was already installed. Stabilizing the platform requires picking a canonical version that CI, the packaging contract, and consuming apps all target. Without an explicit decision, drift between developer laptops, CI runners, and frozen builds was inevitable. |
+| Decision | The **canonical Phoenix UI Platform Python version is 3.12.** `phoenix-commons` CI (`.github/workflows/ci.yml`) uses `python-version: "3.12"`. Consuming apps target 3.12 for their packaging contract (build venv, `requirements*.txt`, `installer.iss` runtime checks). `pyproject.toml` keeps `requires-python = ">=3.10"` as a floor so developer machines on 3.10–3.14 can install editable; the *contract target* is 3.12. |
+| Rationale | (1) **PyInstaller maturity** — 6.x has shipped Windows wheels for 3.12 since late 2023; newer interpreter wheels have lagged. Bootloader builds against 3.12 are battle-tested across all 4 production tools. (2) **Qt ecosystem stability** — PySide6 6.10.x is fully validated on 3.12; newer interpreter versions occasionally expose corner-case binding issues that take a release cycle to settle. (3) **CI consistency** — GitHub Actions `setup-python@v5` has 3.12 as a first-tier supported version with reliable cache hits. (4) **Desktop-platform stability** — production tools deploy to ATS workstations whose installer-runtime expectations are pinned to 3.12 today; gratuitously rev'ing the interpreter is a coordinated-deploy burden with no offsetting benefit. (5) **AV / tooling compatibility** — the S1 signature documented in `BLOCKERS.md §1` was characterised against 3.12-based bootloaders; switching interpreter versions would re-open the question of whether the same signature fires on newer bootloaders. |
+| Consequences | • **App developers may experimentally use newer Python locally** (3.13, 3.14) for dev convenience, but commits to commons-consuming apps must NOT introduce 3.13-or-newer-only syntax or stdlib usage. • Production tools' `build.bat` files should pin the build venv to 3.12 (`py -3.12 -m venv .venv`) when they migrate to commons-backed. • PCC currently uses 3.14 on Justin's laptop; its packaging pipeline must move to 3.12 before Phase 7 retrofits start so the platform and PCC share the same interpreter target. • 3.14 only enters the platform contract when an explicit superseding ADR replaces this one. |
+| Enforcement | CI uses 3.12 (Windows-latest). Per-app `requirements*.txt` pins should declare PySide6 versions known to work on 3.12. `pyproject.toml` keeps `>=3.10` floor for developer convenience but the **CI signal is the contract**. |
+| Cross-reference | `.github/workflows/ci.yml`, `docs/ui-platform-baseline-v1/PHASES.md` (Phase 2.x prep), `docs/ui-platform-baseline-v1/STABILIZATION_REPORT_01.md` (introduction of this ADR) |
+
 ---
 
 ## DEFERRED
