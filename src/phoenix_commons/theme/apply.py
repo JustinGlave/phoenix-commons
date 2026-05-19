@@ -20,7 +20,7 @@ from pathlib import Path
 from PySide6.QtGui import QColor, QPalette
 from PySide6.QtWidgets import QApplication
 
-from ._embedded_qss import _EMBEDDED_QSS
+from .embedded_qss import EMBEDDED_QSS
 
 
 def _resource_path(filename: str) -> str:
@@ -69,4 +69,4 @@ def apply_dark_theme(app: QApplication) -> None:
         with open(qss_path, "r", encoding="utf-8") as fh:
             app.setStyleSheet(fh.read())
     else:
-        app.setStyleSheet(_EMBEDDED_QSS)
+        app.setStyleSheet(EMBEDDED_QSS)
