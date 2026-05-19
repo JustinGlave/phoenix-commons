@@ -1,0 +1,39 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python 3.12 (canonical platform version — ADR-014)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install phoenix-commons (editable) + test extras
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e .[test]
+
+      - name: py_compile all Python files
+        run: python -m compileall -q .
+
+      - name: Run smoke tests
+        env:
+          QT_QPA_PLATFORM: offscreen
+        run: pytest -q tests/
+
+  # No PyInstaller build, no Inno Setup, no release asset publishing.
+  # phoenix-commons is a library — packaging/installer concerns belong
+  # to consuming apps, not this CI workflow.
+  #
+  # See docs/ui-platform-baseline-v1/PACKAGING_CONTRACT.md for the
+  # downstream-consumer build conventions.

@@ -1,0 +1,72 @@
+phoenix-commons
+Copyright (c) 2026 ATS Automation. All rights reserved.
+
+PROPRIETARY — INTERNAL USE ONLY.
+
+This software, including its source code, build scripts, design tokens,
+canonical stylesheets, widgets, helpers, updater code, documentation,
+and any accompanying materials (collectively, "the Software"), is the
+proprietary work of ATS Automation. It is licensed to ATS Automation
+and its employees for INTERNAL USE in the course of ATS Automation
+business operations only.
+
+This software is the **Phoenix UI Platform** — the shared platform
+that powers the Phoenix Controls desktop tool family. It is NOT open
+source. The following are prohibited without prior written consent
+from ATS Automation:
+
+  1. Redistribution, in source or binary form, to any party outside
+     ATS Automation.
+  2. Public disclosure of the source code, documentation, or any
+     materially derived design system.
+  3. Modification or sublicensing for use outside ATS Automation.
+  4. Commercial use outside the scope of ATS Automation business.
+  5. Inclusion of the Software, in whole or in part, in any third-
+     party product or distribution.
+
+Authorized use:
+
+  - ATS Automation employees may use, modify, and run the Software
+    on hardware operated by ATS Automation in the ordinary course of
+    their work duties.
+  - Internal forks (e.g. on ATS-administered Git hosting) are
+    permitted for the purpose of contributing changes back upstream.
+  - Phoenix-family applications (Job Tracker, Phoenix CAD Tool,
+    Phoenix Checkout Tool, ValveMasterTool, Phoenix Command Center)
+    may import, embed, and redistribute the Software as part of
+    their compiled application binaries shipped to ATS internal
+    end-users.
+
+Confidential information:
+
+The Software may contain non-public technical, business, or
+infrastructure information. Recipients are expected to treat the
+Software with the same care given to other confidential ATS
+Automation material — do not share, post, publish, or describe its
+contents in any public forum (including but not limited to public
+GitHub repositories, blog posts, social media, conference talks, or
+support requests filed with third-party vendors) without first
+obtaining written approval from ATS Automation.
+
+No warranty:
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS, ATS AUTOMATION, OR ANY CONTRIBUTOR BE
+LIABLE FOR ANY CLAIM, DAMAGES, OR OTHER LIABILITY, WHETHER IN AN
+ACTION OF CONTRACT, TORT, OR OTHERWISE, ARISING FROM, OUT OF, OR IN
+CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+Termination:
+
+Authorization to use the Software terminates automatically upon the
+end of the user's employment or contractual relationship with ATS
+Automation, or upon written notice from ATS Automation. Upon
+termination, all copies of the Software (including local clones,
+installed builds, and any derived works) must be deleted from the
+user's devices unless otherwise instructed in writing.
+
+Questions about licensing or authorized use should be directed to
+Justin Glave (justing@atsinc.org) or ATS Automation internal IT.

@@ -104,3 +104,102 @@ def test_phase2_no_scroll_submodule() -> None:
     assert NoScrollSpinBox.__name__ == "NoScrollSpinBox"
     assert NoScrollDoubleSpinBox.__name__ == "NoScrollDoubleSpinBox"
     assert NoScrollDateEdit.__name__ == "NoScrollDateEdit"
+
+
+# ── Platform-stabilization smoke (added with UI Platform Baseline v1) ──
+#
+# Every Phoenix app inherits these checks. Keep them lightweight + fast.
+
+def test_make_qss_non_empty() -> None:
+    """The canonical QSS resource resolves to a non-empty stylesheet.
+
+    Both forms are checked:
+      - the package-data ``phoenix_style.qss`` file
+      - the embedded fallback string in ``_embedded_qss._EMBEDDED_QSS``
+    """
+    from pathlib import Path
+    import phoenix_commons.theme as theme_pkg
+    qss_file = Path(theme_pkg.__file__).parent / "phoenix_style.qss"
+    assert qss_file.exists(), f"missing canonical QSS at {qss_file}"
+    file_text = qss_file.read_text(encoding="utf-8")
+    assert len(file_text) > 5000, (
+        f"canonical QSS shrank to {len(file_text)} chars — likely truncated"
+    )
+
+    from phoenix_commons.theme._embedded_qss import _EMBEDDED_QSS
+    assert isinstance(_EMBEDDED_QSS, str)
+    assert len(_EMBEDDED_QSS) > 5000, (
+        f"embedded QSS fallback shrank to {len(_EMBEDDED_QSS)} chars"
+    )
+
+
+def test_component_instantiation(qtbot) -> None:
+    """Every public widget must construct under offscreen Qt.
+
+    Doesn't render or interact — just proves the constructors don't
+    raise. qtbot manages the QApplication lifecycle.
+    """
+    from phoenix_commons.widgets import (
+        PrimaryButton, SecondaryButton, TertiaryButton,
+        Panel, PageTitle, PageSubtitle, SectionTitle, HintLabel,
+        PhoenixTable, UpdateBanner,
+    )
+    # Widgets that accept an optional text label
+    for cls in (
+        PrimaryButton, SecondaryButton, TertiaryButton,
+        Panel, PageTitle, PageSubtitle, SectionTitle, HintLabel,
+    ):
+        try:
+            w = cls("smoke")
+        except TypeError:
+            w = cls()
+        qtbot.addWidget(w)
+
+    # PhoenixTable — no args
+    qtbot.addWidget(PhoenixTable())
+
+    # UpdateBanner — requires (current_version, latest_version) positional args
+    qtbot.addWidget(UpdateBanner("0.1.0", "0.2.0"))
+
+
+def test_no_scroll_instantiation(qtbot) -> None:
+    """The no-scroll widget family must also construct."""
+    from phoenix_commons.widgets.no_scroll import (
+        NoScrollComboBox, NoScrollSpinBox,
+        NoScrollDoubleSpinBox, NoScrollDateEdit,
+    )
+    for cls in (
+        NoScrollComboBox, NoScrollSpinBox,
+        NoScrollDoubleSpinBox, NoScrollDateEdit,
+    ):
+        w = cls()
+        qtbot.addWidget(w)
+
+
+def test_canonical_token_names_present_in_qss() -> None:
+    """The canonical Phoenix token hex values must appear in the QSS.
+
+    Until Phase 2.1 promotes the tokens to a dedicated module, the QSS
+    file is the canonical reference for the token vocabulary. This
+    smoke check guards against the QSS being regenerated with a
+    different palette (e.g. someone accidentally lifting ValveMaster's
+    legacy gray "System B" colours).
+
+    Phase 2.1 will replace this with a direct import:
+        from phoenix_commons.theme.tokens import C
+        assert C['accent'] == '#dc2626'  # or whichever final hex
+    """
+    from pathlib import Path
+    import phoenix_commons.theme as theme_pkg
+    qss = (Path(theme_pkg.__file__).parent / "phoenix_style.qss").read_text(
+        encoding="utf-8"
+    )
+    # Background tier — known to be in System A
+    canonical_substrings = [
+        "#0a0e27",   # bg or close cousin (Phoenix dark navy family)
+        "#dc2626",   # accent red family (System A primary)
+    ]
+    missing = [s for s in canonical_substrings if s.lower() not in qss.lower()]
+    assert not missing, (
+        f"canonical Phoenix token(s) missing from QSS: {missing!r}"
+    )
