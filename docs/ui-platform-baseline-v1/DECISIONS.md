@@ -1,0 +1,227 @@
+# DECISIONS.md
+
+> Architecture Decision Log. Three sections:
+>
+> 1. **Finalized** — decided, in effect now, change requires a new
+>    ADR superseding the prior one.
+> 2. **Deferred** — explicitly postponed. Has a trigger condition
+>    for re-evaluation.
+> 3. **Rejected** — considered and rejected. Listed so the same
+>    proposal isn't re-litigated later.
+>
+> Use ADR-style format. New decisions get appended; old ones stay
+> visible.
+
+---
+
+## FINALIZED
+
+### ADR-001: phoenix-commons is the UI platform, not a utility grab-bag
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-13 (architecture pivot during Phase 5 wizard work) |
+| Status | Finalized |
+| Context | Original rollout framed commons as "shared helpers lifted from production tools." That framing produced scope creep (every utility looked reusable) and ambiguous ownership (apps kept local copies for safety). |
+| Decision | Reframe commons as a **UI platform** — design tokens, QSS, widgets, paths, updater, icons, resources — with hard scope rules (COMMONS_SCOPE.md). Apps **extend** the platform; they don't fork it. |
+| Consequences | Slows down adding things to commons (raises the bar). Makes the contract crisp. Forces apps to use subclassing + extension points instead of copy-paste. |
+
+### ADR-002: Apps extend via addendum, not fork
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-16 (this baseline) |
+| Status | Finalized |
+| Context | Without an explicit prohibition, retrofitted apps will inevitably copy commons primitives "just to tweak one thing." That re-introduces drift. |
+| Decision | Forbid forks. App-specific behaviour MUST come from subclassing, `objectName`-based QSS overrides, or composition. Never modification of commons primitives in-place. |
+| Consequences | Some app-specific needs become harder ("how do I change just THIS panel's padding?"). Forces a clean conversation about whether the need is genuinely app-specific (extend) or a commons gap (new token / new variant). |
+| Enforcement | Code review per retrofit PR. Future automation in Phase 9 (lint rule for hardcoded hex / commons-selector overrides). |
+
+### ADR-003: Two updater payload contracts coexist long-term
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-13 (Phase 0 production inventory finding) |
+| Status | Finalized |
+| Context | Phase 0 found two payload shapes shipping in production: full-folder (Job Tracker, Phoenix CAD) and exe-only (Phoenix Checkout, ValveMaster). Switching either group to the other would require a coordinated full-reinstall for existing users. |
+| Decision | Preserve both contracts. Commons API exposes the choice via the `expected_internal: bool = True` kwarg on `download_and_apply`. Validator helper exposes it via `--require-internal`. The wizard's standalone scaffold defaults to full-folder (the canonical pattern). Retrofitted production tools keep their existing contract. |
+| Consequences | Slightly more complex commons API surface (one kwarg). Eliminates the risk of breaking existing user installs. Removes the temptation to coordinate a high-risk full-reinstall deploy. |
+| Cross-reference | PACKAGING_CONTRACT.md §1, DEPENDENCY_GRAPH.md "Updater contracts" |
+
+### ADR-004: Pilot batch is Phoenix Checkout + Phoenix CAD
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-16 (this baseline) |
+| Status | Finalized |
+| Context | Original rollout planned a sequential retrofit (CAD → Checkout → ValveMaster → Job Tracker). Pilot-of-one approach can't prove the migration **scales** beyond N=1. |
+| Decision | Pilot is a batch of two: Phoenix Checkout + Phoenix CAD. Lowest combined risk (CAD already on System A so visible change ≈ 0; Checkout has the simpler updater contract). Two-at-once stress-tests the contract before ValveMaster's high-visibility theme swap and Job Tracker's high surface area. |
+| Consequences | Pilot review report becomes a hard gate before Phase 8. Two PRs open simultaneously requires coordinated reviewing. If the pilot finds a commons contract issue, both retrofits get to learn from it. |
+| Cross-reference | MIGRATION_RULES.md "Migration order" |
+
+### ADR-005: System A (Phoenix dark navy) is the only design system
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-13 (Phase 0) |
+| Status | Finalized |
+| Context | ValveMaster shipped with a legacy gray palette ("System B", `#1c1c1c`). The other three production tools shipped with System A (Phoenix dark navy). |
+| Decision | System B is deprecated. ValveMaster gets the System A theme in its Phase 8a retrofit, with the visual change explicitly noted in release notes. |
+| Consequences | ValveMaster users experience a visible re-skin on the upgrade post-retrofit. Brand consistency across the tool family is restored. |
+| Cross-reference | DESIGN_SYSTEM.md "Forbidden patterns" |
+
+### ADR-006: Internal-proprietary license, not open source
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-15 (PCC branding/packaging work) |
+| Status | Finalized |
+| Context | PCC and `phoenix-commons` ship under an ATS Automation internal license. Public PyPI publishing or open-sourcing the code is not authorized. |
+| Decision | All repos use the proprietary license in `LICENSE` (see PCC's file for canonical wording). Public disclosure / redistribution / external use requires written ATS approval. |
+| Consequences | Distribution-strategy options for commons narrow (no public PyPI). GitHub Packages, private index, or submodule remain. |
+| Cross-reference | `phoenix-command-center/LICENSE`, `SECURITY.md` |
+
+### ADR-007: Commons-backed wizard radio stays non-default until frozen-exe clears
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-13 (Phase 5 wizard implementation) |
+| Status | Finalized |
+| Context | At wizard implementation time, the AV blocker prevented frozen-exe verification of any scaffolded tool. Defaulting users to the unverified commons-backed scaffold would have created a support burden when their builds failed. |
+| Decision | "Phoenix Tool — standalone" stays the default radio. "Phoenix Tool — commons-backed" is enabled (when commons_path is configured) but carries an inline note: "Frozen-exe runtime verification is still blocked by local AV." |
+| Consequences | Standalone scaffolds carry their own copy of commons primitives (current PCC pattern). Switch to commons-backed default after Phase 6C verifies the commons-backed frozen exe end-to-end. |
+| Cross-reference | `phoenix-commons/docs/rollout/phase-5-report.md`, `phase-5b-commons-ux-fix-report.md` |
+
+### ADR-008: Build pipeline uses sentinel-substitution templates, not f-string formatting
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-13 (Phase 5 templating) |
+| Status | Finalized |
+| Context | Several wizard template files (QSS, `.bat`, Inno Setup) contain literal `{` / `}` braces. Using `str.format` for `{TOOL_NAME}`-style substitution would have required `{{` / `}}` escaping throughout, creating noise. |
+| Decision | Use `__TOKEN__` sentinel substitution in `phoenix_tool_templates.py`. Tokens are `__TOOL_NAME__`, `__PRETTY__`, `__EXE_NAME__`, `__EXE_STEM__`. Substituted via a small `_substitute()` helper using `str.replace`. |
+| Consequences | Template files read cleanly with no escaping. Adding a new token is trivial. Verified by post-substitution grep: zero residual `__TOKEN__` markers in any generated file. |
+| Cross-reference | `phoenix-command-center/phoenix_tool_templates.py:_substitute` |
+
+### ADR-009: Phase 6A — validator out of inline PowerShell
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-13 (Phase 6 finding, Phase 6A fix) |
+| Status | Finalized |
+| Context | `build.bat`'s original tail had a multi-line PowerShell snippet that read the auto-updater zip and validated its contents. Using cmd.exe's `^` line-continuation token. Failed when `build.bat` was invoked through a PowerShell wrapper (the outer shell reinterpreted the carets). |
+| Decision | Move validation into a dedicated Python helper `scripts/validate_release_zip.py`. `build.bat` calls it via a single-line `.venv\Scripts\python` invocation. Both cmd-direct and PS-wrapped invocations work. |
+| Consequences | Build tail is now one line instead of an embedded multi-line script. Helper is testable in isolation (3 pytest cases + 5 CLI scenarios). Replicated into every wizard-scaffolded tool. |
+| Cross-reference | `phoenix-commons/docs/rollout/phase-6a-build-template-fix-report.md` |
+
+---
+
+## DEFERRED
+
+### ADR-010: Commons distribution strategy
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-16 |
+| Status | Deferred to Phase 9 |
+| Question | How should `phoenix-commons` be distributed to consumers? Submodule, private PyPI, GitHub Packages, Plan B vendoring? |
+| Trigger to re-evaluate | When Phase 8 retrofits start. At that point, "every tool has a `commons/` submodule" gets operationally painful and the question becomes urgent. |
+| Current state | Wizard's commons-backed radio uses a git submodule. Plan B vendoring is documented in the original rollout plan as a fallback. |
+| Cross-reference | BLOCKERS.md §5 |
+
+### ADR-011: Light-mode palette
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-16 |
+| Status | Deferred indefinitely |
+| Question | Should the Phoenix design system support a light-mode palette? |
+| Decision | **No light mode on roadmap.** Phoenix apps are dark-mode by design (better for industrial / control-room contexts, lower eye strain in shop-floor environments). |
+| Trigger to re-evaluate | Explicit user feedback from production users asking for light mode. None received in 5 years of production use; unlikely to change. |
+
+### ADR-012: Automated lint enforcement for design-system drift
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-16 |
+| Status | Deferred to Phase 9 |
+| Question | Should a lint rule block hardcoded hex colours / forbidden patterns in app source? |
+| Decision | Manually enforced today via code review. Automation deferred until commons-backed retrofits land and we know the false-positive surface. |
+| Trigger to re-evaluate | After Phase 8 — if drift is observed in retrofitted apps, add the rule. |
+
+### ADR-013: Telemetry / usage metrics
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-16 |
+| Status | Deferred indefinitely |
+| Question | Should Phoenix tools collect anonymous usage telemetry? |
+| Decision | **No telemetry by default.** Internal tooling, small user base, easier to ask directly. Adding network calls also expands the security surface (see SECURITY.md). |
+| Trigger to re-evaluate | If/when the user base grows beyond ATS internal use. |
+
+---
+
+## REJECTED
+
+### ADR-R1: Switch all production tools to a single updater payload contract
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-13 (during Phase 0 inventory) |
+| Status | Rejected |
+| Proposal | Move Phoenix Checkout + ValveMaster from exe-only updater zips to full-folder updater zips, unifying the contract. |
+| Reasoning | Would require a coordinated full-reinstall deploy for every existing user the first time they upgrade post-switch. Higher risk than preserving the asymmetry. The commons API supports both shapes via a kwarg — no code-side reason to force consolidation. |
+| Result | Both contracts coexist. See ADR-003. |
+
+### ADR-R2: Lift ValveMaster's QPalette-based theme into commons
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-13 (during Phase 0 inventory) |
+| Status | Rejected |
+| Proposal | Add a programmatic-palette path to `phoenix_commons.theme` so ValveMaster's existing approach can stay. |
+| Reasoning | ValveMaster's palette is the deprecated "System B" gray, not a different way of expressing System A. Lifting it would entrench a non-canonical design. Better: ValveMaster gets the System A QSS in Phase 8a retrofit. |
+| Result | Commons only ships QSS-based theming. |
+
+### ADR-R3: Make commons-backed the wizard default before AV clears
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-13 (Phase 5) |
+| Status | Rejected |
+| Proposal | Promote "Phoenix Tool — commons-backed" to the default wizard radio even though frozen-exe verification is blocked. |
+| Reasoning | Would generate scaffolded apps whose `build.bat` produces a broken release zip on this laptop. Operational footgun. Standalone scaffolds work end-to-end source-mode AND frozen-mode (until AV fires on the exe), so they're the safer default. |
+| Result | Standalone stays default. Commons-backed enabled with an AV-caveat note. See ADR-007. |
+
+### ADR-R4: Bundle a system font into PyInstaller builds
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-16 |
+| Status | Rejected |
+| Proposal | Add a bundled `.ttf` (e.g. Inter, Source Sans) to commons so every Phoenix tool renders identically across machines. |
+| Reasoning | Adds 200-400 KB per release for marginal gain. Windows users overwhelmingly have Segoe UI; the fallback chain in `theme.py` handles macOS/Linux dev. Also adds licensing surface. |
+| Result | System fonts only. See DESIGN_SYSTEM.md "Typography". |
+
+### ADR-R5: One-installer-for-everything ("Phoenix Suite")
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-16 |
+| Status | Rejected |
+| Proposal | Bundle all 5 tools into a single `PhoenixSuiteSetup.exe` instead of per-tool installers. |
+| Reasoning | Production tools have independent release cadences; a unified installer forces synchronised releases. Users often use only 1-2 tools at a time. Disk-space and upgrade-fragility costs exceed the install-once convenience. Each tool's existing installer is already low-friction (per-user install, no admin). |
+| Result | Per-tool installers stay the model. |
+
+---
+
+## How to add a new ADR
+
+1. Pick the next sequential number (`ADR-014`, `ADR-015`, …).
+2. Use the 5-row table format: Date, Status, Context, Decision, Consequences.
+3. Add a "Cross-reference" row if relevant baseline files document the
+   decision in more detail.
+4. Append to the appropriate section (Finalized / Deferred /
+   Rejected). Don't re-order older ADRs.
+5. If the new ADR supersedes an existing one, mark the older ADR's
+   status as **Superseded by ADR-XXX** and keep it visible.
