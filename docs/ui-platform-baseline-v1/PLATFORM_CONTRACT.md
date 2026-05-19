@@ -31,10 +31,10 @@ A retrofit MAY:
 
 | Aspect | Owner | Extension point |
 |--------|-------|------------------|
-| Hex values for `bg`, `surface`, `card`, `border`, `accent`, `teal`, status colours, text colours | `phoenix_commons.theme.tokens` (planned Phase 2.1) | Apps **do not** add tokens. New shared tokens go through a commons PR. |
-| Font family + weight ramp | `phoenix_commons.theme.tokens` | Same — commons-owned. |
-| Spacing constants (gutter, padding tiers) | `phoenix_commons.theme.tokens` | Apps use the constants; do not invent new ones inline. |
-| Border-radius constants (button / card / panel / chip) | `phoenix_commons.theme.tokens` | Same. |
+| Hex values for `bg`, `surface`, `primary`, `secondary`, `accent`, status colours, text colours | `phoenix_commons.theme.tokens` (landed Phase 2.5) | Apps **do not** add tokens. New shared tokens go through a commons PR. |
+| Font family + weight ramp | `phoenix_commons.theme.tokens` (font tokens land in a later phase) | Same — commons-owned. |
+| Spacing constants (gutter, padding tiers) | `phoenix_commons.theme.tokens` (spacing tokens land in a later phase) | Apps use the constants; do not invent new ones inline. |
+| Border-radius constants (button / card / panel / chip) | `phoenix_commons.theme.tokens` (radius tokens land in a later phase) | Same. |
 
 ### 🪟 QSS (canonical stylesheet)
 

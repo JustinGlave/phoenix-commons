@@ -9,13 +9,19 @@ Design notes:
   listed here raises :class:`IconNotFoundError` with the available
   names suggested in the message. Closed-set semantics is what lets
   the IDE / lint surface typos at call time rather than runtime.
-* ``SEMANTIC_COLORS`` mirrors the Phoenix System A palette (see
-  ``PLATFORM_CONTRACT.md``). When the formal token module lands in a
-  later Phase 2.x step, this map will become a thin facade over it;
-  the public icon API (``color="primary"``) stays unchanged.
+* ``SEMANTIC_COLORS`` is re-exported from
+  :mod:`phoenix_commons.theme.tokens` (the canonical token module
+  landed in Phase 2.5). Future palette changes live there; this
+  module is a thin facade so the public icon API (``color="primary"``)
+  keeps the same import path.
 * Both maps are deliberately tiny. New names go through a commons PR.
 """
 from __future__ import annotations
+
+# SEMANTIC_COLORS is canonical in theme.tokens — re-exported here so
+# the icon-side import stays stable even if tokens move under
+# phoenix_commons.generated/ in a later phase.
+from phoenix_commons.theme.tokens import SEMANTIC_COLORS
 
 
 class IconNotFoundError(KeyError):
@@ -49,21 +55,10 @@ ICON_NAMES: frozenset[str] = frozenset({
 })
 
 
-# ---------------------------------------------------------------------------
-# Semantic colour palette. Hex values aligned to Phoenix System A.
-# ``text`` is the default (white-on-navy reads cleanly across all icons).
-# ---------------------------------------------------------------------------
-SEMANTIC_COLORS: dict[str, str] = {
-    "primary":   "#dc2626",   # accent red
-    "secondary": "#1e3a8a",   # deep blue
-    "accent":    "#3b82f6",   # blue
-    "text":      "#ffffff",   # default — white on the dark navy bg
-    "muted":     "#94a3b8",   # subdued slate
-    "success":   "#22c55e",   # green
-    "warning":   "#f59e0b",   # amber
-    "error":     "#ef4444",   # red (lighter than primary on purpose)
-    "info":      "#3b82f6",   # same as accent — informational chrome
-}
+# Semantic palette is canonical in theme.tokens. Re-exported above so
+# `from phoenix_commons.icons.registry import SEMANTIC_COLORS` keeps
+# working (and so the icon API documentation lists it in one place).
+# Source of truth: ``phoenix_commons.theme.tokens.SEMANTIC_COLORS``.
 
 
 # ---------------------------------------------------------------------------
