@@ -127,6 +127,22 @@
 | Enforcement | CI uses 3.12 (Windows-latest). Per-app `requirements*.txt` pins should declare PySide6 versions known to work on 3.12. `pyproject.toml` keeps `>=3.10` floor for developer convenience but the **CI signal is the contract**. |
 | Cross-reference | `.github/workflows/ci.yml`, `docs/ui-platform-baseline-v1/PHASES.md` (Phase 2.x prep), `docs/ui-platform-baseline-v1/STABILIZATION_REPORT_01.md` (introduction of this ADR) |
 
+### ADR-015: Temporary commons distribution strategy = git submodule
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-19 (Phase 2.6 — Packaging verification) |
+| Status | Finalized |
+| Scope | Phases 3 through 8 inclusive. Phase 9+ may revisit. |
+| Context | The original Phase 0/1 plan deferred the distribution-mechanism question to Phase 9 (see superseded ADR-010). Phase 2.5 + Phase 2.6 verification work now needs a concrete answer so consuming apps can be scaffolded with a stable contract. Three candidates considered: (a) **git submodule** — every consuming tool adds `phoenix-commons` as a submodule under `commons/`, `pip install -e ./commons` from the tool's venv; (b) **private package registry** — host wheels on a private PyPI / GitHub Packages and `pip install phoenix-commons` from there; (c) **vendoring** — copy the package source into each tool's `vendor/phoenix_commons/` (the "Plan B" from the original rollout plan). |
+| Decision | **For Phases 3 through 8: git submodule + editable install is the official transport mechanism.** Every consuming app adds a `commons/` submodule pinned to a specific commit (or branch tip — the wizard scaffolds branch-tracking) and installs it via `pip install -e ./commons`. Wheels-from-registry distribution is explicitly deferred to Phase 9+. |
+| Rationale | (1) **Matches PCC wizard assumptions** — the new-tool wizard already scaffolds `git submodule add` + `pip install -e ./commons`. No tooling rewrite. (2) **Lowest migration friction** — apps that retrofit later inherit a working pattern from the dogfood phase, no infrastructure burden. (3) **Easiest rollback** — `git submodule update --recursive <prev-sha>` returns a tool to a known-good commons state in one command. No "yank a wheel" coordination. (4) **Easiest branch coordination** — when a commons branch is being developed against a tool branch, both are checked out together; no out-of-band wheel-publish step. (5) **Simplest package-data behaviour** — `pip install -e` puts `phoenix_commons` on `sys.path` from the submodule's working tree, so `importlib.resources` and PyInstaller `--collect-data` work identically in source and frozen mode. (6) **Works offline** — no network call to a registry. Important for ATS workstations behind firewalls. (7) **Avoids premature package-registry complexity** — running a private PyPI mirror (or paying for one) only makes sense once the cross-app commons API is stable. Phase 9+ when the API has settled. |
+| Consequences | • Every retrofitted tool gains a `commons/` submodule + `.gitmodules` entry. • Wizard's commons-backed scaffold is the official path for new tools; standalone scaffolds stay the safer default until frozen-exe verification clears (per ADR-007). • Plan B (vendoring) remains documented as the explicit fallback if `pip install -e ./commons` ever fails under PyInstaller — see the original rollout plan. • CI per consuming app must `git submodule update --init --recursive` before installing. • A new pinned-commit policy is needed when commons MAJOR-version bumps land — tools choose when to bump their submodule SHA. • **Eventual revisit** at Phase 9 may flip the decision to a private wheel registry once cross-app stability is proven and the wheel-publish cadence is justified. |
+| Expected submodule layout | Every consuming app's repo root contains: `commons/` (the submodule, populated by `git submodule update --init --recursive`); `.gitmodules` (one entry, pointing at `JustinGlave/phoenix-commons` over HTTPS); the tool's `requirements.txt` includes `-e ./commons` immediately after the PySide6 pins; the tool's `build.bat` runs `git submodule update --init --recursive` before `pip install -r requirements.txt`. |
+| Editable-install expectations | `pip install -e ./commons` resolves `phoenix_commons.__version__` from `commons/src/phoenix_commons/_version.py`. Package data (`*.qss`, `*.svg`) is reachable via `importlib.resources.files(...)` (verified in Phase 2.6 — see `tests/test_packaging.py`). The editable install puts the working-tree `src/phoenix_commons/` on `sys.path` — changes to commons take effect on next Python interpreter start without a re-install. |
+| Consuming-app assumptions | (1) Consuming apps NEVER import from underscore paths in commons (see API_BOUNDARIES.md). (2) Consuming apps NEVER edit commons source as part of their own retrofit (per ADR-002 — extend via addendum, not fork). (3) Consuming apps pin their commons submodule to a specific commit before each release tag so the release is reproducible. (4) Consuming apps respect the Generated Artifacts Policy — the generated `embedded_qss.py` etc. are read-only outputs. |
+| Cross-reference | ADR-002 (apps extend via addendum), ADR-007 (commons-backed wizard radio non-default), ADR-010 (the deferred ADR this supersedes for Phases 3-8), PACKAGING_CONTRACT.md, BLOCKERS.md §5 |
+
 ---
 
 ## DEFERRED
@@ -136,11 +152,11 @@
 | Field | Value |
 |-------|-------|
 | Date | 2026-05-16 |
-| Status | Deferred to Phase 9 |
+| Status | **Superseded by ADR-015** for Phases 3-8. Re-opens at Phase 9. |
 | Question | How should `phoenix-commons` be distributed to consumers? Submodule, private PyPI, GitHub Packages, Plan B vendoring? |
-| Trigger to re-evaluate | When Phase 8 retrofits start. At that point, "every tool has a `commons/` submodule" gets operationally painful and the question becomes urgent. |
-| Current state | Wizard's commons-backed radio uses a git submodule. Plan B vendoring is documented in the original rollout plan as a fallback. |
-| Cross-reference | BLOCKERS.md §5 |
+| Trigger to re-evaluate | At Phase 9 — when cross-app commons API is proven stable and the wheel-publish cadence is justified. The Phase 8 retrofits will produce real signal on whether submodule-based distribution scales. |
+| Current state (post-ADR-015) | Phases 3-8 use **git submodule + `pip install -e ./commons`** per ADR-015. Plan B vendoring remains documented as the explicit fallback if editable install ever fails under PyInstaller. Private package registry / wheels deferred until Phase 9+. |
+| Cross-reference | **ADR-015** (the supersession), BLOCKERS.md §5 |
 
 ### ADR-011: Light-mode palette
 
