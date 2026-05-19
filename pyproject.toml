@@ -28,7 +28,10 @@ version = { attr = "phoenix_commons._version.__version__" }
 [tool.setuptools.packages.find]
 where = ["src"]
 
-# Phase 2 will add phoenix_style.qss under phoenix_commons/theme/.
-# Declare it ahead of time so the package picks it up on install.
+# Package-data declarations.
+# Both wheels and PyInstaller (--collect-data phoenix_commons) pick these
+# up via importlib.resources; source-mode (editable installs) reads from
+# the working tree directly.
 [tool.setuptools.package-data]
-"phoenix_commons.theme" = ["*.qss"]
+"phoenix_commons.theme"        = ["*.qss"]
+"phoenix_commons.icons.lucide" = ["*.svg"]
