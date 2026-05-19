@@ -143,6 +143,19 @@
 | Consuming-app assumptions | (1) Consuming apps NEVER import from underscore paths in commons (see API_BOUNDARIES.md). (2) Consuming apps NEVER edit commons source as part of their own retrofit (per ADR-002 — extend via addendum, not fork). (3) Consuming apps pin their commons submodule to a specific commit before each release tag so the release is reproducible. (4) Consuming apps respect the Generated Artifacts Policy — the generated `embedded_qss.py` etc. are read-only outputs. |
 | Cross-reference | ADR-002 (apps extend via addendum), ADR-007 (commons-backed wizard radio non-default), ADR-010 (the deferred ADR this supersedes for Phases 3-8), PACKAGING_CONTRACT.md, BLOCKERS.md §5 |
 
+### ADR-016: PCC palette reconciliation — controlled accent override
+
+| Field | Value |
+|-------|-------|
+| Date | 2026-05-19 (final stabilization decision before Phase 3A pilot migrations) |
+| Status | Finalized |
+| Full text | `ADR_PCC_PALETTE_RECONCILIATION.md` (standalone — this is the only ADR with its own file, given its scope as the final architecture-level decision before pilot migrations) |
+| Context | Phase 2.7 surfaced that three palettes coexist in production: `phoenix_style.qss` canonical (navy + red + blue), PCC's `theme.py` (navy + orange + teal), ValveMaster's System B (deprecated gray). PCC and the QSS-file palette are both currently labelled "System A" in different docs — naming collision must resolve before Phase 3A. |
+| Decision | **Option B — controlled accent override.** Commons exposes a small named set of brand tokens (`PRIMARY`, `SECONDARY`, `ACCENT`) which apps may override via a controlled `BrandProfile` mechanism. Every other token (`BG`, `SURFACE`, `TEXT`, `MUTED`, `SUCCESS`, `WARNING`, `ERROR`, all spacing, all typography, all radii) is **locked** — apps cannot override. PCC keeps orange + teal as its registered brand profile; Phoenix CAD / Job Tracker / Phoenix Checkout / ValveMaster use the default profile. |
+| Options considered | A — PCC adopts full commons canonical (rejected: loses PCC identity, no path for future tool variants). B — controlled accent override (accepted). C — per-app arbitrary themes (rejected: contradicts ADR-001 + ADR-002; slow-motion design-system fork). |
+| Consequences | • Phase 3+ commons implementation adds a `BrandProfile` dataclass + sentinel-form QSS template + `apply_dark_theme(app, brand=...)` kwarg. • PCC's retrofit registers its own `BrandProfile`; other tools use the default. • `DESIGN_SYSTEM.md` and `PLATFORM_CONTRACT.md` updated to reflect locked-vs-variant classification. • One widget system, one QSS architecture, one token hierarchy preserved. • Future tools that legitimately need an accent variant have a controlled path; arbitrary palette forks remain forbidden. |
+| Cross-reference | `ADR_PCC_PALETTE_RECONCILIATION.md` (the full text), ADR-001 (commons as UI platform), ADR-002 (apps extend, not fork), `STABILIZATION_REPORT_06.md` (where the divergence was surfaced), `STABILIZATION_REPORT_07.md` (where this ADR lands), `DESIGN_SYSTEM.md` (post-update), `PLATFORM_CONTRACT.md` § Theme tokens (post-update), `visual-baselines/pcc/baseline.md` (PCC's retrofit guidance), `visual-baselines/MIGRATION_VISUAL_REVIEW_CHECKLIST.md` (the per-PR addenda) |
+
 ---
 
 ## DEFERRED
