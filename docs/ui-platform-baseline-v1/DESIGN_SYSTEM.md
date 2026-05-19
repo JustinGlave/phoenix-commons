@@ -1,72 +1,104 @@
 # DESIGN_SYSTEM.md
 
-> The Phoenix dark-navy design system (System A). One palette, one
-> type ramp, one spacing scale, one widget catalog. Apps follow it
-> without exception; deviations require a Phase 2.1 token-vocabulary
-> PR before any app code lands.
+> The Phoenix dark-navy design system. One canonical structure
+> (spacing, typography, widgets, QSS architecture, locked tokens),
+> with a narrow controlled brand-profile override (3 tokens —
+> `PRIMARY`, `SECONDARY`, `ACCENT`) per ADR-016. Apps follow this
+> without exception; deviations beyond the brand-profile slots
+> require a new ADR superseding ADR-016.
 
-## Palette (System A)
+## Canonical palette (the default brand profile + locked tokens)
 
-Background / surface tier (darker → lighter):
+The canonical Phoenix palette landed in
+`phoenix_commons.theme.tokens` in Phase 2.5. ADR-016 (2026-05-19)
+classifies the tokens into two tiers: **locked** (commons-owned;
+apps may NOT override) and **brand-profile variant-allowed**
+(apps may override via the BrandProfile mechanism, landing in
+Phase 3+).
 
-| Token | Hex | Used for |
-|-------|-----|----------|
-| `bg` | `#18181F` | Window background |
-| `sidebar` | `#1C1C2A` | Sidebar background |
-| `surface` | `#21212E` | Content surface (input rows, etc.) |
-| `card` | `#27273A` | Cards, panels, tool rows |
-| `card_hover` | `#2E2E42` | Card hover state |
-| `card_sel` | `#32324A` | Card selected state |
-| `border` | `#34344A` | Default border |
-| `border_hi` | `#4A4A68` | Hover / highlighted border |
+### Locked tokens (universal across every Phoenix tool)
 
-Accent + brand:
+Background / surface tier:
 
 | Token | Hex | Used for |
 |-------|-----|----------|
-| `accent` | `#E8783C` | Phoenix orange — primary CTAs, brand emphasis |
-| `accent_dark` | `#C05E28` | Pressed-state CTAs |
-| `accent_glow` | `rgba(232, 120, 60, 0.18)` | Soft glow / hover halo |
-| `teal` | `#3CB8AE` | Secondary brand colour — totals, commons indicators |
-| `teal_dark` | `#2A8880` | Pressed-state secondary |
+| `BG` | `#0a0e27` | Window background |
+| `SURFACE` | `#141829` | Cards / panels / inputs |
+| `SURFACE_ALT` | `#0f1219` | Alternating-row surface |
 
 Text (high → low contrast):
 
 | Token | Hex | Used for |
 |-------|-----|----------|
-| `text` | `#E4E4F0` | Primary body / labels |
-| `text_sub` | `#9090B0` | Secondary text (subtitles, hints) |
-| `text_muted` | `#58587A` | Muted (placeholder, disabled) |
-| `text_inv` | `#18181F` | Text on light surfaces (rare) |
+| `TEXT` | `#ffffff` | Primary body / labels |
+| `MUTED` | `#94a3b8` | Secondary / placeholder / disabled |
 
-Status (semantic):
+Status (semantic — must be universal across all Phoenix tools so
+affordances transfer cleanly between apps):
 
 | Token | Hex | Used for |
 |-------|-----|----------|
-| `success` | `#4EC47A` | "clean", "passed", "online" |
-| `warning` | `#F0A030` | "dirty", "needs attention" |
-| `error` | `#E84848` | Failure, blocked |
+| `SUCCESS` | `#22c55e` | "clean", "passed", "online" |
+| `WARNING` | `#f59e0b` | "dirty", "needs attention" |
+| `ERROR` | `#ef4444` | Failure, blocked |
 
-Forbidden:
+Spacing, typography, and radii (see later sections) are all
+locked; apps may not override.
+
+### Brand-profile tokens (variant-allowed per ADR-016)
+
+Three named slots. Apps may override via `BrandProfile` at
+`apply_dark_theme(app, brand=...)` time. The default profile
+matches the values below — every tool that doesn't register an
+override gets these.
+
+| Token | Default hex | Used for |
+|-------|-------------|----------|
+| `PRIMARY` | `#dc2626` | Brand red — primary / destructive CTAs |
+| `SECONDARY` | `#1e3a8a` | Deep blue — secondary brand chrome |
+| `ACCENT` | `#3b82f6` | Blue — focus / link / highlight chrome |
+| `INFO` | (= `ACCENT`) | Informational chrome — aliased to ACCENT, follows brand override automatically |
+
+PCC's registered profile (per ADR-016 § 9 "Migration
+implications"):
+
+| Token | PCC override | Versus default |
+|-------|---------------|-----------------|
+| `PRIMARY` | `#E8783C` (Phoenix orange) | red → orange |
+| `SECONDARY` | `#3CB8AE` (teal) | deep blue → teal |
+| `ACCENT` | `#3CB8AE` (teal) | blue → teal |
+
+Other production tools (Phoenix CAD / Job Tracker / Phoenix
+Checkout / ValveMaster post-Phase-8a) use the default profile.
+
+### Forbidden
 
 - The legacy ValveMaster gray `#1c1c1c` palette ("System B"). Will
-  be replaced by System A in Phase 8a retrofit.
-- Pure black (`#000`) — use `text_inv` or `bg`.
-- Pure white (`#FFF`) — use `text` for body text.
-- Saturated mid-blues that clash with `accent_glow` halos.
+  be replaced by the default brand profile in Phase 8a retrofit.
+- Pure black (`#000`) — use `BG` or `SURFACE_ALT`.
+- App-local QSS / Python overriding **locked** tokens. Apps may
+  override ONLY the three brand tokens above via `BrandProfile`.
+- Inline `setStyleSheet("color: #ABCDEF")` in app code — even for
+  brand-profile colours; route through `tokens.SEMANTIC_COLORS`
+  / `tokens.PRIMARY` etc.
+- Saturated mid-blues that clash with whichever brand `ACCENT`
+  resolves to.
 
 ## Typography
 
-| Role | Family | Size | Weight | Letter-spacing |
-|------|--------|------|--------|----------------|
-| Body | "Segoe UI", "SF Pro Display", sans-serif | 13 px | 400 | — |
-| Section header (`sectionHeader`) | same | 10 px | 700 (uppercase) | 1.2 px |
-| Page title (`pageTitle`) | same | 28 px | 800 | -0.5 px |
-| Stat value (`statValue`) | same | 28 px | 800 | -0.5 px |
-| Stat label (`statLabel`) | same | 10 px | 700 (uppercase) | 1.2 px |
-| Card title (`cardTitle`) | same | 13 px | 700 | — |
-| Hint label (`HintLabel`) | same | 11 px | 400 | — |
-| Monospaced (`mono` rule, planned) | "Consolas", monospace | 12 px | 400 | — |
+Locked (apps may NOT override).
+
+The objectNames below are the source of truth from
+`phoenix_commons.widgets.typography`:
+
+| Role | objectName | Family | Size | Weight |
+|------|------------|--------|------|--------|
+| Body | (default) | "Segoe UI", system | 13 px | 400 |
+| Page title (`PageTitle` class) | `ProjectTitle` | same | 14 pt | bold |
+| Page subtitle (`PageSubtitle`) | `ProjectSubtitle` | same | 10 pt | muted |
+| Section title (`SectionTitle`) | `SectionTitle` | same | 12 pt | semibold |
+| Hint label (`HintLabel`) | `hint` | same | 9 pt | muted |
+| Monospaced (`mono` rule, planned) | (TBD) | "Consolas", monospace | 12 px | 400 |
 
 System fonts only — no bundled `.ttf`. PySide6 inherits the user's
 Segoe UI on Windows; the fallback chain covers macOS / Linux for
@@ -104,22 +136,36 @@ Windows chrome.
 
 ## Button semantics
 
-Three button tiers, all from `phoenix_commons.widgets.buttons`:
+Three button tiers, all from `phoenix_commons.widgets.buttons`.
+The objectNames below are the **canonical source of truth** from
+the widget code (verified Phase 2.5 / ADR-016 reconciliation —
+earlier doc revisions named `accentBtn` / `ghostBtn` which never
+existed in commons code; corrected here):
 
 | Class | objectName | Visual | Use for |
 |-------|-----------|--------|---------|
-| `PrimaryButton` | `accentBtn` | Filled orange, white text | The one main action on the screen (New Tool, Save, Launch installed) |
-| `SecondaryButton` | `ghostBtn` | Card-coloured fill, body text | Supporting actions (Refresh, Settings, Cancel) |
-| `TertiaryButton` | (default) | Transparent, accent text | Inline / row-level actions (icon-only buttons, back arrows) |
+| `PrimaryButton` | (default — none) | Filled with brand `PRIMARY`, white text | The one main action on the screen (Save, Generate, Submit, Launch installed) |
+| `SecondaryButton` | `secondaryButton` | Surface fill, body text | Supporting actions (Refresh, Settings, Cancel) |
+| `TertiaryButton` | `tertiaryButton` | Transparent, brand-accent text | Inline / row-level actions (icon-only buttons, back arrows, dismiss ✕) |
+
+Under the default brand profile, `PrimaryButton` renders red;
+under PCC's registered profile, the same widget renders orange.
+The class / objectName don't change — the brand-profile
+substitution at apply time does.
 
 Rules:
 
-- **One PrimaryButton per dialog / screen.** If you need two, one
-  should be Secondary.
-- **Don't put a coloured icon on a Primary** — the colour is
-  already doing the work.
-- **Use object-name overrides for "this button only" rules** — never
-  inline `setStyleSheet("color: …")`.
+- **One `PrimaryButton` per dialog / screen.** If you need two,
+  one should be `SecondaryButton`.
+- **Don't put a coloured icon on a `PrimaryButton`** — the brand
+  colour is already doing the work.
+- **Use objectName-based QSS for "this button only" rules** —
+  never inline `setStyleSheet("color: …")`.
+- **App-local objectNames must not collide with commons-owned
+  names** (`secondaryButton`, `tertiaryButton`, `Panel`,
+  `ProjectTitle`, `ProjectSubtitle`, `SectionTitle`, `hint`,
+  `UpdateBanner`, `UpdateMsg`, `InstallBtn`) — see
+  `COMPONENT_CONTRACT.md` § Reserved name rules.
 
 ## Interaction colours
 
@@ -215,7 +261,9 @@ Run through this before merging any UI change:
 
 | Item | Phase | Notes |
 |------|-------|-------|
-| `phoenix_commons.theme.tokens` module | 2.1 | Promotes the current `C` dict to a real public API. |
+| `phoenix_commons.theme.tokens` module | 2.5 ✅ landed | Canonical token home; mirrors the QSS-file palette per Phase 2.5. |
+| `BrandProfile` mechanism + sentinel-form QSS | 3+ (TBD) | Implements ADR-016. Adds `apply_dark_theme(app, brand=...)` kwarg; sentinel-substitutes `__BRAND_PRIMARY__` / `__BRAND_SECONDARY__` / `__BRAND_ACCENT__` at apply time. |
+| PCC retrofit registering its brand profile | 3C | Per ADR-016 § 9. |
 | Auto-generated component gallery | 9 | Snapshot screenshots of every widget in every state. |
-| Light-mode palette | not planned | Phoenix apps are dark-mode by design. No light mode on roadmap. |
-| WCAG audit | 9 | All accent / status combos against text colours. |
+| Light-mode palette | not planned | Phoenix apps are dark-mode by design. ADR-011 deferred indefinitely. |
+| WCAG audit | 9 | All brand-accent / status combos against text colours, per brand profile. |

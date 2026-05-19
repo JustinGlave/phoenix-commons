@@ -29,12 +29,53 @@ A retrofit MAY:
 
 ### 🎨 Theme tokens (palette, typography, spacing, radii)
 
-| Aspect | Owner | Extension point |
-|--------|-------|------------------|
-| Hex values for `bg`, `surface`, `primary`, `secondary`, `accent`, status colours, text colours | `phoenix_commons.theme.tokens` (landed Phase 2.5) | Apps **do not** add tokens. New shared tokens go through a commons PR. |
-| Font family + weight ramp | `phoenix_commons.theme.tokens` (font tokens land in a later phase) | Same — commons-owned. |
-| Spacing constants (gutter, padding tiers) | `phoenix_commons.theme.tokens` (spacing tokens land in a later phase) | Apps use the constants; do not invent new ones inline. |
-| Border-radius constants (button / card / panel / chip) | `phoenix_commons.theme.tokens` (radius tokens land in a later phase) | Same. |
+Per ADR-016 (2026-05-19), tokens classify into two tiers:
+**locked** (commons-owned; apps may NOT override at runtime) and
+**brand-profile variant-allowed** (apps may override via the
+`BrandProfile` mechanism landing in Phase 3+).
+
+#### Locked tokens (commons-owned; no app override)
+
+| Aspect | Hex / value | Why locked |
+|--------|--------------|------------|
+| `BG` | `#0a0e27` | Universal Phoenix dark navy chrome |
+| `SURFACE` | `#141829` | Universal card / panel / input surface |
+| `SURFACE_ALT` | `#0f1219` | Universal alternating-row surface |
+| `TEXT` | `#ffffff` | Accessibility / contrast guarantee |
+| `MUTED` | `#94a3b8` | Accessibility / contrast guarantee |
+| `SUCCESS` | `#22c55e` | Semantic affordance — must be universal across all Phoenix tools |
+| `WARNING` | `#f59e0b` | Same |
+| `ERROR` | `#ef4444` | Same |
+| Font family + weight ramp | (font tokens land in a later phase) | Structural — drift = design-system fork |
+| Spacing constants (gutter, padding tiers) | (spacing tokens land in a later phase) | Same |
+| Border-radius constants | (radius tokens land in a later phase) | Same |
+
+Apps that attempt to override locked tokens at runtime fail
+loudly (Phase 3+ implementation enforces). The only legitimate
+way to change a locked token is a commons PR.
+
+#### Brand-profile variant-allowed (apps may override per ADR-016)
+
+| Token | Default | What apps may do |
+|-------|---------|-------------------|
+| `PRIMARY` | `#dc2626` (red) | Override via `BrandProfile(primary=...)` |
+| `SECONDARY` | `#1e3a8a` (deep blue) | Override via `BrandProfile(secondary=...)` |
+| `ACCENT` | `#3b82f6` (blue) | Override via `BrandProfile(accent=...)` |
+| `INFO` | (= `ACCENT`) | Follows `ACCENT` automatically — no separate override slot |
+
+The brand-profile mechanism itself (`BrandProfile` class +
+sentinel-form QSS + `apply_dark_theme(app, brand=...)` kwarg)
+lands in Phase 3+ implementation. Today, all four tokens
+resolve to the canonical defaults.
+
+Apps that register a custom `BrandProfile`:
+
+- PCC: `BrandProfile(primary="#E8783C", secondary="#3CB8AE", accent="#3CB8AE")` (Phase 3C)
+- Every other Phoenix tool: uses the default (no kwarg required)
+
+Adding new variant-allowed slots requires a **new ADR
+superseding ADR-016.** The 3-slot list is intentionally small to
+keep the divergence surface bounded.
 
 ### 🪟 QSS (canonical stylesheet)
 
