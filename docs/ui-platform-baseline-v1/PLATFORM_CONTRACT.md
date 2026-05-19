@@ -142,6 +142,52 @@ lets commons restructure without breaking apps.
 | App needs a new colour for a specific business state (e.g. "approved" green) | Use the closest existing commons token (`C['success']`) if semantically aligned. If genuinely new, propose a new commons token via PR. |
 | App needs an icon commons doesn't provide | Drop it in the app's `assets/`, load via `paths.resource_path("assets/...")`. If 2+ apps need the same icon, propose adding it to commons in Phase 2.6's extension catalog. |
 
+## Generated artifacts policy
+
+Some commons-owned files are **derived outputs** produced from another
+canonical source. They follow a single rule set:
+
+1. **Canonical derived outputs.** A generated artifact is the
+   authoritative committed form of a transformation of some upstream
+   source. The upstream source is the input; the artifact is the output;
+   both live in git.
+2. **Committed to git.** Generated artifacts ARE committed (not gitignored).
+   This guarantees reproducible installs from a fresh clone without
+   running a build step, and lets `pip install` / PyInstaller pick the
+   artifact up as ordinary package data.
+3. **Never hand-edited.** Hand-editing a generated artifact is prohibited
+   — its docstring or header banner must say so explicitly. The only way
+   to change it is to change the upstream source and re-run the
+   generator.
+4. **Generation contract.** Every generated artifact must have:
+   - **Deterministic generation** — identical input produces byte-identical
+     output (line endings normalised, no timestamps, no hostnames).
+   - **A documented regeneration command** — e.g.
+     `python -m phoenix_commons.theme.generate_embedded_qss`.
+   - **CI stale-drift protection** where practical — at minimum a pytest
+     that re-renders and compares to the on-disk artifact; optionally a
+     git `--exit-code` diff check in a lint hook.
+5. **Eventual home.** Generated artifacts should live under
+   `phoenix_commons/generated/` or `phoenix_commons/_generated/` once
+   there are more than one or two. Until then, individual artifacts may
+   sit alongside their consumers (e.g. `theme/embedded_qss.py` lives in
+   `theme/` because the theme loader is its only consumer).
+6. **Current generated artifacts:**
+   - `phoenix_commons/theme/embedded_qss.py` — derived from
+     `phoenix_commons/theme/phoenix_style.qss` via
+     `phoenix_commons.theme.generate_embedded_qss`.
+7. **Future likely generated artifacts:**
+   - Icon registries (e.g. a `phoenix_commons.icons._catalog` enum
+     generated from the on-disk `lucide/` SVG set).
+   - Token exports (e.g. a JSON or `.ts` mirror of the Python token
+     module for design-tooling consumers).
+   - Template registries (e.g. a manifest of new-tool wizard templates
+     emitted by Command Center build tooling).
+
+The policy exists to make the line between "source" and "output" legible
+at PR-review time. If you find yourself editing a generated file by
+hand, stop — change the upstream source instead.
+
 ## Contract enforcement
 
 | Mechanism | Owner |
