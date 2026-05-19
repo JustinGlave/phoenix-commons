@@ -1,10 +1,16 @@
-"""cache.py — in-memory QIcon cache for the icons package.
+"""_cache.py — internal QIcon cache for ``phoenix_commons.icons``.
 
-Why a separate module:
+Module-name underscore signals **this is private to the icons package**.
+External code must never import ``phoenix_commons.icons._cache`` directly
+— go through ``phoenix_commons.icons.clear_cache`` (the only function
+re-exported from the package ``__init__``) for the legitimate consumer
+need (test cache reset / explicit invalidation).
 
-* Encapsulates the cache-key shape (``(name, color, size)``). Callers
-  never construct keys directly; ``loader.icon()`` and the cache talk
-  through ``get`` / ``put`` / ``clear``.
+Why a dedicated module:
+
+* Encapsulates the cache-key shape (``(name, color, size)``). The
+  loader and the cache talk through ``get`` / ``put`` / ``clear``;
+  nobody constructs keys directly.
 * Lets tests reset the cache cleanly between cases via :func:`clear`
   without poking at private globals on ``loader``.
 * No Qt imports at runtime — :class:`QIcon` is only referenced under
@@ -12,7 +18,8 @@ Why a separate module:
   Qt-free contexts (CI lint, doc generation, etc.).
 
 The cache is a plain dict (process-wide, no eviction). Icons are tiny
-and the closed ICON_NAMES set bounds total entries — no LRU needed.
+and the closed ``ICON_NAMES`` set bounds total entries — no LRU
+machinery needed.
 """
 from __future__ import annotations
 

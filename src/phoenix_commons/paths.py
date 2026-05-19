@@ -26,6 +26,8 @@ import os
 import sys
 from pathlib import Path
 
+__all__ = ["is_frozen", "user_data_dir", "resource_path"]
+
 
 def is_frozen() -> bool:
     """True when running as a PyInstaller bundle."""

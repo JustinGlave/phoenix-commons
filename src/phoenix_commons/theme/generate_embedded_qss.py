@@ -30,6 +30,8 @@ from __future__ import annotations
 import sys
 from pathlib import Path
 
+__all__ = ["render", "main"]
+
 HERE       = Path(__file__).resolve().parent
 QSS_FILE   = HERE / "phoenix_style.qss"
 OUT_FILE   = HERE / "embedded_qss.py"
@@ -49,6 +51,8 @@ Public API:
         ``phoenix_style.qss`` resource cannot be resolved at runtime.
 """
 from __future__ import annotations
+
+__all__ = ["EMBEDDED_QSS"]
 
 # Raw-string so backslashes (rare in QSS but possible) don't need escaping.
 EMBEDDED_QSS = r"""'''

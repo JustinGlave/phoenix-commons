@@ -15,6 +15,8 @@ from PySide6.QtWidgets import QVBoxLayout, QWidget
 
 from .typography import SectionTitle
 
+__all__ = ["Panel"]
+
 
 class Panel(QWidget):
     """Dark rounded card. Add child widgets via .layout() (a QVBoxLayout)."""

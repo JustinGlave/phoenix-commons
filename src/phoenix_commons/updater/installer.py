@@ -40,6 +40,8 @@ from typing import Callable, Optional
 
 from phoenix_commons.updater.client import UpdateInfo
 
+__all__ = ["UpdatePackageError", "download_and_apply"]
+
 logger = logging.getLogger(__name__)
 
 

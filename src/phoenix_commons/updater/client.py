@@ -21,6 +21,8 @@ import urllib.request
 from dataclasses import dataclass
 from typing import Optional
 
+__all__ = ["UpdateInfo", "check_for_update"]
+
 logger = logging.getLogger(__name__)
 
 REQUEST_TIMEOUT = 8  # seconds

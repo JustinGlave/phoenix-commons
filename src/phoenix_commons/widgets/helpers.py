@@ -7,6 +7,8 @@ from __future__ import annotations
 
 from PySide6.QtWidgets import QHBoxLayout
 
+__all__ = ["button_row"]
+
 
 def button_row(*buttons, align_right: bool = True) -> QHBoxLayout:
     """Convenience: horizontal layout of buttons with a leading stretch."""

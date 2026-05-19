@@ -17,6 +17,8 @@ from PySide6.QtWidgets import QFrame, QHBoxLayout, QLabel, QMessageBox, QPushBut
 
 from .buttons import TertiaryButton
 
+__all__ = ["UpdateBanner"]
+
 
 class UpdateBanner(QFrame):
     """Slim banner shown when an update is available.

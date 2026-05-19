@@ -15,6 +15,8 @@ from PySide6.QtCore import QThread, Signal
 
 from phoenix_commons.updater.client import check_for_update
 
+__all__ = ["UpdateCheckThread"]
+
 
 class UpdateCheckThread(QThread):
     """Background thread that polls GitHub Releases for a newer version.

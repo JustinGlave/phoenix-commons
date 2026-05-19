@@ -14,6 +14,8 @@ Public API:
 """
 from __future__ import annotations
 
+__all__ = ["EMBEDDED_QSS"]
+
 # Raw-string so backslashes (rare in QSS but possible) don't need escaping.
 EMBEDDED_QSS = r"""/*
    Phoenix Valve Checkout Tool — QSS Stylesheet

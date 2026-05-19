@@ -22,6 +22,8 @@ from PySide6.QtWidgets import QApplication
 
 from .embedded_qss import EMBEDDED_QSS
 
+__all__ = ["apply_dark_theme"]
+
 
 def _resource_path(filename: str) -> str:
     """Resolve a resource path that works in dev and under PyInstaller.

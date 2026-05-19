@@ -12,6 +12,8 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QTableWidget
 
+__all__ = ["PhoenixTable"]
+
 
 class PhoenixTable(QTableWidget):
     """Read-only data table with Phoenix styling defaults."""

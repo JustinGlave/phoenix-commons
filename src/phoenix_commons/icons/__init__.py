@@ -18,7 +18,7 @@ emoji-icon usages still scattered through the production tools.
 """
 from __future__ import annotations
 
-from .cache import clear as clear_cache
+from ._cache import clear as clear_cache
 from .loader import icon
 from .registry import (
     DEFAULT_COLOR,

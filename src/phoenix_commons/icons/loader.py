@@ -31,7 +31,7 @@ from PySide6.QtCore import QByteArray, QSize, Qt
 from PySide6.QtGui import QIcon, QPainter, QPixmap
 from PySide6.QtSvg import QSvgRenderer
 
-from . import cache
+from . import _cache as cache
 from .registry import (
     DEFAULT_COLOR,
     DEFAULT_SIZE,

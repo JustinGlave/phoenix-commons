@@ -17,6 +17,8 @@ from __future__ import annotations
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QPushButton
 
+__all__ = ["PrimaryButton", "SecondaryButton", "TertiaryButton"]
+
 
 class PrimaryButton(QPushButton):
     """Red primary-action button."""
