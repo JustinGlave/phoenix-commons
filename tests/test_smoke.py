@@ -177,29 +177,43 @@ def test_no_scroll_instantiation(qtbot) -> None:
 
 
 def test_canonical_token_names_present_in_qss() -> None:
-    """The canonical Phoenix token hex values must appear in the QSS.
+    """The canonical QSS contains locked tokens literally + brand sentinels.
 
-    Until Phase 2.1 promotes the tokens to a dedicated module, the QSS
-    file is the canonical reference for the token vocabulary. This
-    smoke check guards against the QSS being regenerated with a
-    different palette (e.g. someone accidentally lifting ValveMaster's
-    legacy gray "System B" colours).
+    Locked tokens (BG, SURFACE, …) appear as hex literals because they're
+    universal across every Phoenix tool. Brand tokens (PRIMARY, SECONDARY,
+    ACCENT) appear as ``__BRAND_*__`` sentinels per ADR-016 — substituted
+    at apply time against the active :class:`BrandProfile`.
 
-    Phase 2.1 will replace this with a direct import:
-        from phoenix_commons.theme.tokens import C
-        assert C['accent'] == '#dc2626'  # or whichever final hex
+    Guards against:
+      - QSS regenerated with a different palette (e.g. someone accidentally
+        lifting ValveMaster's legacy gray "System B" colours)
+      - brand tokens accidentally un-sentinelized (which would bake the
+        default brand in and silently break PCC-style overrides)
     """
     from pathlib import Path
     import phoenix_commons.theme as theme_pkg
     qss = (Path(theme_pkg.__file__).parent / "phoenix_style.qss").read_text(
         encoding="utf-8"
     )
-    # Background tier — known to be in System A
-    canonical_substrings = [
-        "#0a0e27",   # bg or close cousin (Phoenix dark navy family)
-        "#dc2626",   # accent red family (System A primary)
+
+    # Locked tokens — must appear literally.
+    locked_substrings = [
+        "#0a0e27",   # BG
+        "#141829",   # SURFACE
     ]
-    missing = [s for s in canonical_substrings if s.lower() not in qss.lower()]
-    assert not missing, (
-        f"canonical Phoenix token(s) missing from QSS: {missing!r}"
+    missing_locked = [s for s in locked_substrings if s.lower() not in qss.lower()]
+    assert not missing_locked, (
+        f"canonical Phoenix locked-token(s) missing from QSS: {missing_locked!r}"
+    )
+
+    # Brand sentinels — must appear (ADR-016).
+    brand_sentinels = [
+        "__BRAND_PRIMARY__",
+        "__BRAND_SECONDARY__",
+        "__BRAND_ACCENT__",
+    ]
+    missing_sentinels = [s for s in brand_sentinels if s not in qss]
+    assert not missing_sentinels, (
+        f"brand sentinel(s) missing from QSS: {missing_sentinels!r} — "
+        f"BrandProfile override path is broken"
     )

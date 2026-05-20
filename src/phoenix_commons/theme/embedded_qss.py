@@ -52,11 +52,11 @@ QMenuBar {
 
 QMenuBar::item:selected {
     background-color: #1f2937;
-    color: #3b82f6;
+    color: __BRAND_ACCENT__;
 }
 
 QMenuBar::item:pressed {
-    background-color: #1e3a8a;
+    background-color: __BRAND_SECONDARY__;
 }
 
 QMenu {
@@ -73,11 +73,11 @@ QMenu::item {
 
 QMenu::item:selected {
     background-color: #1f2937;
-    color: #3b82f6;
+    color: __BRAND_ACCENT__;
 }
 
 QMenu::item:pressed {
-    background-color: #1e3a8a;
+    background-color: __BRAND_SECONDARY__;
 }
 
 QMenu::separator {
@@ -91,7 +91,7 @@ QMenu::separator {
    ============================================================================ */
 
 QPushButton, QToolButton {
-    background-color: #dc2626;
+    background-color: __BRAND_PRIMARY__;
     color: #ffffff;
     border: none;
     border-radius: 6px;
@@ -111,7 +111,7 @@ QPushButton:pressed, QToolButton:pressed {
 
 QPushButton:focus {
     outline: none;
-    border: 2px solid #3b82f6;
+    border: 2px solid __BRAND_ACCENT__;
 }
 
 QPushButton:disabled, QToolButton:disabled {
@@ -120,7 +120,7 @@ QPushButton:disabled, QToolButton:disabled {
 }
 
 QPushButton#secondaryButton {
-    background-color: #1e3a8a;
+    background-color: __BRAND_SECONDARY__;
 }
 
 QPushButton#secondaryButton:hover {
@@ -130,12 +130,12 @@ QPushButton#secondaryButton:hover {
 QPushButton#tertiaryButton {
     background-color: transparent;
     border: 1px solid #4b5563;
-    color: #3b82f6;
+    color: __BRAND_ACCENT__;
 }
 
 QPushButton#tertiaryButton:hover {
     background-color: #1f2937;
-    border: 1px solid #3b82f6;
+    border: 1px solid __BRAND_ACCENT__;
 }
 
 /* ============================================================================
@@ -148,11 +148,11 @@ QLineEdit {
     border: 1px solid #2d3748;
     border-radius: 6px;
     padding: 6px 8px;
-    selection-background-color: #3b82f6;
+    selection-background-color: __BRAND_ACCENT__;
 }
 
 QLineEdit:focus {
-    border: 2px solid #3b82f6;
+    border: 2px solid __BRAND_ACCENT__;
 }
 
 QLineEdit:disabled {
@@ -166,11 +166,11 @@ QTextEdit, QPlainTextEdit {
     border: 1px solid #2d3748;
     border-radius: 6px;
     padding: 6px 8px;
-    selection-background-color: #3b82f6;
+    selection-background-color: __BRAND_ACCENT__;
 }
 
 QTextEdit:focus, QPlainTextEdit:focus {
-    border: 2px solid #3b82f6;
+    border: 2px solid __BRAND_ACCENT__;
 }
 
 QTextEdit:disabled, QPlainTextEdit:disabled {
@@ -191,7 +191,7 @@ QComboBox {
 }
 
 QComboBox:focus {
-    border: 2px solid #3b82f6;
+    border: 2px solid __BRAND_ACCENT__;
 }
 
 QComboBox:disabled {
@@ -211,7 +211,7 @@ QComboBox::down-arrow {
 QComboBox QAbstractItemView {
     background-color: #141829;
     color: #ffffff;
-    selection-background-color: #3b82f6;
+    selection-background-color: __BRAND_ACCENT__;
     border: 1px solid #2d3748;
     outline: none;
 }
@@ -237,9 +237,9 @@ QPushButton#comToggleBtn:hover {
 }
 
 QPushButton#comToggleBtn:checked {
-    background-color: #3b82f6;
+    background-color: __BRAND_ACCENT__;
     color: #ffffff;
-    border-color: #3b82f6;
+    border-color: __BRAND_ACCENT__;
     font-weight: 600;
 }
 
@@ -262,7 +262,7 @@ QDateEdit {
 }
 
 QDateEdit:focus {
-    border: 2px solid #3b82f6;
+    border: 2px solid __BRAND_ACCENT__;
 }
 
 /* ============================================================================
@@ -278,7 +278,7 @@ QSpinBox, QDoubleSpinBox {
 }
 
 QSpinBox:focus, QDoubleSpinBox:focus {
-    border: 2px solid #3b82f6;
+    border: 2px solid __BRAND_ACCENT__;
 }
 
 QSpinBox::up-button, QDoubleSpinBox::up-button,
@@ -311,7 +311,7 @@ QCheckBox::indicator {
 }
 
 QCheckBox::indicator:hover {
-    border: 1px solid #3b82f6;
+    border: 1px solid __BRAND_ACCENT__;
     background-color: #1f2937;
 }
 
@@ -321,7 +321,7 @@ QCheckBox::indicator:checked {
 }
 
 QCheckBox::indicator:focus {
-    border: 2px solid #3b82f6;
+    border: 2px solid __BRAND_ACCENT__;
 }
 
 QRadioButton {
@@ -338,12 +338,12 @@ QRadioButton::indicator {
 }
 
 QRadioButton::indicator:hover {
-    border: 1px solid #3b82f6;
+    border: 1px solid __BRAND_ACCENT__;
 }
 
 QRadioButton::indicator:checked {
-    background-color: #1e3a8a;
-    border: 1px solid #1e3a8a;
+    background-color: __BRAND_SECONDARY__;
+    border: 1px solid __BRAND_SECONDARY__;
 }
 
 /* ============================================================================
@@ -398,7 +398,7 @@ QTabBar::tab:selected {
     background-color: #141829;
     color: #ffffff;
     font-weight: 600;
-    border-bottom: 3px solid #dc2626;
+    border-bottom: 3px solid __BRAND_PRIMARY__;
 }
 
 QTabBar::tab:hover:!selected {
@@ -473,7 +473,7 @@ QTreeWidget::item {
 }
 
 QTreeWidget::item:selected {
-    background: #1e3a8a;
+    background: __BRAND_SECONDARY__;
     color: white;
 }
 
@@ -486,7 +486,7 @@ QTreeView::branch {
 }
 
 QTreeView::branch:selected {
-    background: #1e3a8a;
+    background: __BRAND_SECONDARY__;
 }
 
 QTreeView::branch:hover:!selected {
@@ -554,7 +554,7 @@ QProgressBar {
 }
 
 QProgressBar::chunk {
-    background-color: #dc2626;
+    background-color: __BRAND_PRIMARY__;
     border-radius: 4px;
 }
 
@@ -602,7 +602,7 @@ QSplitter::handle {
 }
 
 QSplitter::handle:hover {
-    background-color: #3b82f6;
+    background-color: __BRAND_ACCENT__;
 }
 
 /* ============================================================================
@@ -682,7 +682,7 @@ QLabel#SectionTitle {
 
 #UpdateBanner {
     background: rgba(30, 58, 138, 220);
-    border-top: 1px solid #3b82f6;
+    border-top: 1px solid __BRAND_ACCENT__;
 }
 
 QLabel#UpdateMsg {
@@ -691,7 +691,7 @@ QLabel#UpdateMsg {
 }
 
 #InstallBtn {
-    background: #dc2626;
+    background: __BRAND_PRIMARY__;
     border: 1px solid #ef4444;
     color: white;
     font-weight: 700;
@@ -744,7 +744,7 @@ QLabel#ArchivedBadge {
 }
 
 QLabel#StepBadge {
-    background: #1e3a8a;
+    background: __BRAND_SECONDARY__;
     color: white;
     border-radius: 19px;
     font-weight: 700;
@@ -756,7 +756,7 @@ QLabel#StepBadge {
    ============================================================================ */
 
 QLabel#TagPreview {
-    color: #3b82f6;
+    color: __BRAND_ACCENT__;
     font-size: 10pt;
 }
 
