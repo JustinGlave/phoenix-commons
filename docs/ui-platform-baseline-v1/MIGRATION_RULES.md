@@ -8,6 +8,17 @@
 > Phoenix CAD pilot (`PHASE_3A_PHOENIX_CAD_REPORT.md`,
 > `PHASE_3A_POST_REVIEW_REPORT.md`). The retrofit-doctrine section
 > below is the canonical "how to do a retrofit" reference.
+>
+> Updated 2026-05-19 with four additions codified from the Phase 3B
+> Phoenix Checkout retrofit (`PHASE_3B_PHOENIX_CHECKOUT_REPORT.md`,
+> `PHASE_3B_POST_REVIEW_AND_MERGE_REPORT.md`):
+>
+> - § 0. Pre-flight commons-API gap inventory (new explicit step)
+> - § 1. Local facade strategy — *hybrid facade + preserved-local
+>   coexistence in the same file* (refinement)
+> - § 10. Source-mode validation checklist — row 8 strengthened; new
+>   row 11 (actual app launch + main-window construction)
+> - § 11. Monolith inline-class retrofit pattern (new section)
 
 ## Migration order
 
@@ -17,7 +28,7 @@ the original "two tools at once" framing was relaxed):
 | Phase | Tool | Branch name | Status |
 |-------|------|-------------|--------|
 | **3A** | Phoenix CAD Tool (Lab Layout Tool) | `phase-3a-phoenix-cad-retrofit` | ✅ Merged 2026-05-19 (merge commit `79c7003` on `lab-layout-tool:master`). Retrofit branch preserved on origin per MIGRATION_RULES § Per-retrofit branch + PR convention. |
-| **3B** | Phoenix Checkout Tool | `phase-3b-phoenix-checkout-retrofit` | Not started — gated by Phase 3A merge + user approval |
+| **3B** | Phoenix Checkout Tool | `phase-3b-phoenix-checkout-retrofit` | 🔵 Retrofit complete + reviewed; merge pending. Retrofit work: B1–B7 (`76f2c23`..`5153aad`) + regression fix B8 (`80dace8`). Doctrine additions in this document codified from `PHASE_3B_PHOENIX_CHECKOUT_REPORT.md` + `PHASE_3B_POST_REVIEW_AND_MERGE_REPORT.md`. |
 | **3C** | Phoenix Command Center | `phase-3c-pcc-retrofit` | Not started — gated by Phase 3A merge + PCC palette ADR implementation (ADR-016 mechanism is ready in commons; PCC just registers its BrandProfile) |
 | **8a** | ValveMasterTool | `phase-8a-valvemaster-retrofit` | Not started — System B → A visible-theme swap |
 | **8b** | Job Tracker (Project Tracking Tool) | `phase-8b-job-tracker-retrofit` | Not started — largest surface; `starter_package/` deletion in same PR |
@@ -54,6 +65,41 @@ This section codifies what worked in the Phase 3A Phoenix CAD pilot.
 Every subsequent retrofit (3B onward) follows this pattern unless an
 explicit deviation is approved.
 
+### 0. Pre-flight commons-API gap inventory
+
+*Added 2026-05-19 from the Phase 3B Phoenix Checkout retrofit.*
+
+Before opening the retrofit branch, audit the tool's existing platform
+helpers against the commons public API and produce an explicit gap
+inventory. The product is a table of every locally-defined symbol that
+the retrofit could plausibly replace, paired with the commons symbol it
+would map to (or `—` if no commons equivalent exists).
+
+For every gap (local symbol with no clean commons equivalent), present
+a binary decision to the user **before retrofit work starts**:
+
+| Option | Meaning |
+|--------|---------|
+| **A. Keep local** | The behaviour is intentional or app-specific. Retrofit treats the symbol as preserved-local (see § 1 below). No commons changes. |
+| **B. Add to commons** | The behaviour is genuinely generic and a future second consumer is realistic. Retrofit pauses while a commons PR adds the symbol; then proceeds. |
+
+Choose Option A by default. Option B requires evidence that ≥ 2 tools
+will consume the symbol (one current + one credibly anticipated).
+A speculative second consumer is not evidence.
+
+Document the decision per gap in the retrofit's post-retrofit report.
+Phase 3B's two gaps:
+
+| Local symbol | Commons equivalent? | Decision | Rationale |
+|--------------|---------------------|----------|-----------|
+| `apply_light_theme` (Checkout `checkout_tool_gui.py`) | No — commons is dark-only per ADR-011. | **A. Keep local** | Light mode is a user-facing toggle (View → Dark Mode + QSettings persistence). Removing it would break behaviour. ADR-011 explicitly excludes light mode from commons; this is settled doctrine. |
+| Split `download_update` + `apply_update` (Checkout `updater.py`) | No — commons exposes only combined `download_and_apply`. | **A. Keep local** | Checkout v1.7.0's threaded-install behaviour depends on the split (download in background thread, apply on main thread). Combining would re-introduce the v1.6.x UI-freeze regression. Future commons PR could add the split — flagged in Phase 3B report as a candidate, not blocking. |
+
+This step would have caught the false-start in earlier sessions where
+"retrofit `updater.py` to commons" was discussed without inventorying
+which functions in `updater.py` had commons equivalents. The inventory
+forces the question.
+
 ### 1. Local facade strategy
 
 Each retrofitted subsystem stays as a **local file** in the consuming
@@ -78,6 +124,29 @@ Why local facades over direct commons imports at every call site:
   paths, source-mode policy) lives where it belongs (in the app).
 - The retrofit PR's diff is concentrated in the platform-helper
   files; reviewers can audit ~5 small files instead of every call site.
+
+**Hybrid facade + preserved-local coexistence** *(added 2026-05-19,
+Phase 3B Checkout)*. A single local file MAY contain both
+commons-facaded functions AND preserved-local functions side by side.
+The Phase 3A Phoenix CAD pattern made every retrofitted file a
+whole-file facade; Phase 3B Phoenix Checkout proved that intra-file
+hybrids are equally valid and sometimes required:
+
+| File | Facaded symbols (delegate to commons) | Preserved-local symbols (keep app behaviour) |
+|------|---------------------------------------|-----------------------------------------------|
+| `updater.py` (Checkout) | `check_for_update` (4-kwarg call to `phoenix_commons.updater.check_for_update`); `UpdateInfo` (re-import for type identity) | `download_update`, `apply_update`, `download_and_apply` — split-install threaded behaviour from v1.7.0; exe-only payload extraction (`expected_internal=False` semantics per ADR-003) |
+| `checkout_tool_gui.py` theme region (Checkout) | `apply_dark_theme` (facade calling `phoenix_commons.theme.apply_dark_theme`) | `apply_light_theme` (~30 lines; ADR-011 keeps light mode out of commons) |
+
+Rules for hybrid files:
+
+1. Every preserved-local symbol carries an inline docstring note
+   citing **why** it's local (ADR reference, behavioural contract,
+   threading requirement, etc.).
+2. The retrofit's pre-flight gap inventory (§ 0) must explicitly
+   list each preserved-local symbol with its Option-A decision.
+3. The post-retrofit report's file-by-file diff narrative calls out
+   the hybrid structure so future retrofits / audits don't mistake
+   it for incomplete retrofit work.
 
 ### 2. Identity-equal widget verification
 
@@ -249,11 +318,138 @@ Every retrofit's final-validation step exercises (minimum):
 | 5 | `inspect.getsource(updater.download_and_apply)` contains the expected `expected_internal=<True/False>` | Match tool's payload contract |
 | 6 | `paths.<APP_CONSTANT>` resolves to the expected path | Match pre-retrofit value |
 | 7 | `QT_QPA_PLATFORM=offscreen` apply_dark_theme + widget construction | No exceptions; styleSheet substantial; default-brand hex present; sentinels absent |
-| 8 | `QT_QPA_PLATFORM=offscreen python -c "import app"` | No exceptions (exercises every transitive import) |
+| 8 | `QT_QPA_PLATFORM=offscreen python -c "import <entry-module>"` (e.g. `import app`, `import checkout_tool_gui`) | No exceptions on top-level module load. **Note**: this only exercises module-load code paths. It does NOT catch undefined-name bugs that live inside function bodies executed later (Python resolves names lazily at runtime). See row 11. |
 | 9 | `git -C commons rev-parse HEAD == git -C <commons-parent> rev-parse main` | Submodule pinned to commons main HEAD (or an intentional older SHA — document if so) |
 | 10 | Commons-side `pytest -q tests/` | All tests pass (no regressions from retrofit-enabling commons changes) |
+| 11 | **Actual source-mode app launch** — `python <entry-script>.py`, then verify the main window exists and the process is alive ≥ 3 seconds | Process alive; `MainWindowTitle` is the expected app title; no crash traceback on stderr |
 
 Any failing row = retrofit blocks merge.
+
+**Row 8 vs row 11 — why both are required.** *Added 2026-05-19 from
+Phase 3B Phoenix Checkout regression B8 (`80dace8`).*
+
+The Phase 3B B2 retrofit (`0bb1618`) removed `import os` from
+`checkout_tool_backend.py` because the retrofitted function
+(`_app_data_path`) no longer used it. The PR passed `compileall` AND
+the row-8 import-only smoke. The regression — `CheckoutStore._load()`
+crashing with `NameError: name 'os' is not defined` at
+`os.path.exists(DATA_FILE)` — only surfaced when an actual `MainWindow()`
+instance constructed and called `self._store = CheckoutStore()` in
+its `__init__`.
+
+The lesson: any business logic that runs only after `app.exec_()` —
+which is most of what an application actually does — is invisible to
+import-only smoke. Row 11 forces an actual end-to-end source-mode
+launch. Cost: ~5 seconds per retrofit. Benefit: catches an entire
+class of regression that no static check can.
+
+**Recommended row 11 implementation** (on Windows + PowerShell):
+
+```powershell
+$p = Start-Process -FilePath '.venv\Scripts\pythonw.exe' `
+    -ArgumentList '<entry-script>.py' `
+    -WorkingDirectory '<tool-root>' -PassThru
+Start-Sleep -Seconds 4
+$alive = Get-Process -Id $p.Id -ErrorAction SilentlyContinue
+if ($alive) { "PASS PID=$($p.Id) Title='$($alive.MainWindowTitle)'" } else { "FAIL exited" }
+```
+
+**Whole-file import-removal audit rule** (corollary). When a retrofit
+removes a top-level `import X` from a file because the retrofitted
+function no longer needs `X`, audit EVERY remaining use of `X` in the
+file — not just the function being retrofitted. Python's lazy name
+resolution means `compileall` will not catch the regression.
+Concretely: `grep -nE "\\bX\\." <file>` and confirm zero hits before
+removing the import.
+
+### 11. Monolith inline-class retrofit pattern
+
+*Added 2026-05-19 from the Phase 3B Phoenix Checkout retrofit.*
+
+Some tools (Phoenix Checkout's `checkout_tool_gui.py`, 3,468 lines)
+don't have a clean platform-helper file structure — their widget
+classes are defined **inline at the top of a monolithic GUI module**,
+not in a separate `ui/components.py`. The Phase 3A facade pattern
+(swap whole platform-helper files for facades) doesn't apply.
+
+The Phase 3B Checkout B5 commit (`61aac52`) proved the surgical
+pattern for this case:
+
+**Recipe.** Replace the inline `class WidgetName(QPushButton)` / etc.
+definitions with a single `from phoenix_commons.widgets import ...`
+statement. Leave every caller site in the same file ENTIRELY
+untouched. If the local name had a different identifier than the
+commons one (e.g. Checkout's `_PhoenixTable` vs commons's
+`PhoenixTable`), use an import alias: `from phoenix_commons.widgets
+import PhoenixTable as _PhoenixTable`.
+
+**Phase 3B B5 example.** Before retrofit (lines 30–60 of
+`checkout_tool_gui.py`):
+
+```python
+class PrimaryButton(QPushButton):
+    def __init__(self, text: str, parent=None):
+        super().__init__(text, parent)
+        self.setMinimumHeight(36)
+        self.setCursor(Qt.CursorShape.PointingHandCursor)
+
+class SecondaryButton(QPushButton):
+    ...
+
+class TertiaryButton(QPushButton):
+    ...
+
+class _PhoenixTable(QTableWidget):
+    ...
+```
+
+After retrofit:
+
+```python
+from phoenix_commons.widgets import (
+    PrimaryButton,
+    SecondaryButton,
+    TertiaryButton,
+    PhoenixTable as _PhoenixTable,
+)
+```
+
+Caller sites elsewhere in the 3,468-line file (`PrimaryButton("Save")`,
+`_PhoenixTable(0, 5)`, etc.) are **byte-identical** before and after.
+The diff is concentrated entirely in the import block.
+
+**Verification.** Identity-equality check per § 2 still applies and is
+the gate:
+
+```python
+import checkout_tool_gui as g
+import phoenix_commons.widgets as cw
+assert g.PrimaryButton    is cw.PrimaryButton
+assert g.SecondaryButton  is cw.SecondaryButton
+assert g.TertiaryButton   is cw.TertiaryButton
+assert g._PhoenixTable    is cw.PhoenixTable
+```
+
+All five Phase 3B Checkout assertions held True post-B5 (B5 verified
+in `PHASE_3B_PHOENIX_CHECKOUT_REPORT.md`).
+
+**Scope discipline.** The monolithic file is NOT permission to also:
+
+- Extract the inline classes to a new `ui/components.py` "while we're
+  here". The point of the inline-import pattern is to retrofit with
+  minimum diff. Extracting to a new file is its own future refactor;
+  it is OUT of the retrofit's scope.
+- Modernise any business logic in the monolith. Forms, tables,
+  dialogs, menu construction, QSettings persistence — all untouched.
+- Refactor the file's organisation (move methods between classes,
+  split a class into two, etc.). The retrofit edits exactly two
+  regions: the inline widget definitions, and the theme function (if
+  the theme is also inline). Everything else is a no-op.
+
+The Phase 3B Checkout retrofit produced a 2-hunk diff in
+`checkout_tool_gui.py` (widget region + theme region). Anything else
+is a scope violation that should trigger a stop-and-ask per the
+Stop conditions section.
 
 ## Rollback policy
 
