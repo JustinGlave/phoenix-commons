@@ -1,12 +1,21 @@
 # INSTALLER_NOTES.md
 
 > Inno Setup conventions, wizard artwork specifications, and AppId
-> hygiene for Phoenix tool installers. Companion to `RELEASE_CHECKLIST.md`.
+> hygiene for Phoenix tool installers. Companion to `RELEASE_CHECKLIST.md`
+> and `FROZEN_BUILD_BASELINE.md`.
 >
 > Documentation only — this file does not execute or modify any installer.
 > The four production tools' `installer.iss` files are the source of truth
 > for what's currently shipping; this document captures the conventions
 > that hold across them and the gaps that future polish should close.
+>
+> **Build prerequisite (codified 2026-05-20)**: the upstream PyInstaller
+> step that feeds Inno Setup MUST run under the frozen-build baseline —
+> Python 3.12 build venv, pinned PyInstaller 6.20.0, pinned PySide6 6.10.2,
+> hardened build.bat (`--noupx` + stdlib excludes). See
+> `FROZEN_BUILD_BASELINE.md`. Inno Setup's job is unchanged by this
+> baseline; the baseline keeps the bootloader exe alive long enough for
+> Inno Setup to compress it into Setup.exe.
 
 ## Installer mechanics — Inno Setup
 
@@ -15,10 +24,11 @@ Software). The pattern:
 
 ```
 build.bat
-  └─→ PyInstaller --onedir --windowed → dist\<AppName>\
-       └─→ ISCC installer.iss → dist\<AppName>Setup.exe
-            └─→ powershell Compress-Archive → dist\<AppName>.zip (updater)
-                 + dist\<AppName>_FullInstall.zip (manual install)
+  └─→ Python 3.12 venv (frozen-build baseline)
+       └─→ PyInstaller --onedir --windowed --noupx → dist\<AppName>\
+            └─→ ISCC installer.iss → dist\<AppName>Setup.exe
+                 └─→ powershell Compress-Archive → dist\<AppName>.zip (updater)
+                      + dist\<AppName>_FullInstall.zip (manual install)
 ```
 
 ### Required directives (all tools)

@@ -536,6 +536,8 @@ PR:
 | Need to change the `AppId` GUID | Hard rule — would orphan existing installs. Justin must approve. |
 | Need to change `<App>.zip` asset name | Breaks the auto-updater for users still on the prior version. Justin must approve. |
 | Need to change install path or user-data path | Same — breaks upgrades. Justin must approve. |
+| Build venv is not Python 3.12.x | Per `FROZEN_BUILD_BASELINE.md` + ADR-014 empirical validation (`BUILD_HARDENING_EXPERIMENT_REPORT_03.md`), frozen builds on 3.13/3.14 are quarantined by S1 on the developer workstation. Source-mode work continues to allow 3.10–3.14. The retrofit's frozen-build step MUST use a 3.12 venv. |
+| `build.bat` is missing the hardened-baseline flags (`--noupx`, stdlib `--exclude-module` list, Step 0 cleanup) | Per `FROZEN_BUILD_BASELINE.md`. The hardening is mandatory for explainability + reproducibility; production tool retrofits should adopt the same flags as the wizard's template default. |
 | Frozen-exe verification fails for a reason **other than** the documented S1/AV pattern | New blocker. Document in `BLOCKERS.md` before continuing. |
 | A test that passes on `main` fails on the retrofit branch | Fix in the retrofit before merge; do not merge a regression. |
 | The visible-change band for the tool is exceeded | Re-scope the retrofit. |

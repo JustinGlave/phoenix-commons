@@ -66,6 +66,18 @@ Stop at the first failure; do not proceed with a half-checked list.
 
 ### 5. Build
 
+- [ ] **Build venv is Python 3.12.x** per ADR-014 + `FROZEN_BUILD_BASELINE.md`.
+      Verify: `.venv\Scripts\python --version` reports 3.12.something.
+      Source-mode work can run on any 3.10–3.14; the build venv
+      specifically must be 3.12. Builds on 3.13/3.14 will be quarantined
+      by S1 on the developer workstation (empirically confirmed
+      `BUILD_HARDENING_EXPERIMENT_REPORT_03.md`).
+- [ ] Build venv has pinned `pyinstaller==6.20.0` and `PySide6==6.10.2`
+      (or newer versions if a future re-isolation experiment validates
+      them — see `FROZEN_BUILD_BASELINE.md § 5`).
+- [ ] `build.bat` uses `--noupx` + stdlib excludes + Step 0 cleanup
+      (the hardened baseline; wizard scaffolds emit this by default
+      since 2026-05-20).
 - [ ] `build.bat` succeeds end to end. No PyInstaller warnings about
       missing files; no Inno Setup errors.
 - [ ] `dist\<ExeName>.exe` is the right size (sanity-check against the
