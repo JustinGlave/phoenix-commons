@@ -33,6 +33,22 @@ A typical retrofit takes **1–2 sessions of focused work** plus a
 2-week MIGRATION_RULES § Frequency-limit cooldown before the next
 tool starts.
 
+## Intentional divergence: monolith vs modular topology
+
+**Application structure follows domain history.** The retrofit
+doctrine supports both shapes equally; subsystem convergence is NOT
+a platform goal. The playbook applies to either shape — only the B5
+commit pattern differs.
+
+| Shape | Example | B5 retrofit pattern |
+|-------|---------|---------------------|
+| **Modular** (separate platform-helper files: `paths.py`, `updater.py`, `ui/style.py`, `ui/components.py`) | Phoenix CAD / Lab Layout Tool | Whole-file facade per `MIGRATION_RULES.md § 1` |
+| **Monolithic** (inline widget classes + inline theme in one large GUI module) | Phoenix Checkout (`checkout_tool_gui.py`, ~3,468 lines) | Inline-import per `MIGRATION_RULES.md § 11` |
+
+Both shapes are valid post-retrofit. The playbook does NOT push tools
+toward one shape. Decisions about future structural refactors are
+out of any retrofit's scope (see Anti-patterns below).
+
 ---
 
 ## P0 — Pre-flight (all items required before opening a branch)
