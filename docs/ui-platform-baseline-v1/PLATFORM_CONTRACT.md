@@ -63,14 +63,15 @@ way to change a locked token is a commons PR.
 | `ACCENT` | `#3b82f6` (blue) | Override via `BrandProfile(accent=...)` |
 | `INFO` | (= `ACCENT`) | Follows `ACCENT` automatically — no separate override slot |
 
-The brand-profile mechanism itself (`BrandProfile` class +
-sentinel-form QSS + `apply_dark_theme(app, brand=...)` kwarg)
-lands in Phase 3+ implementation. Today, all four tokens
-resolve to the canonical defaults.
+The brand-profile mechanism (`BrandProfile` class + sentinel-form
+QSS + `apply_dark_theme(app, brand=...)` kwarg) **landed Phase 3A**.
+Apps that call `apply_dark_theme(app)` without a `brand=` kwarg
+get the default profile (canonical Phoenix red + deep blue + blue);
+apps that want a non-default brand pass a `BrandProfile` instance.
 
 Apps that register a custom `BrandProfile`:
 
-- PCC: `BrandProfile(primary="#E8783C", secondary="#3CB8AE", accent="#3CB8AE")` (Phase 3C)
+- PCC: `BrandProfile(primary="#E8783C", secondary="#3CB8AE", accent="#3CB8AE")` (registered in Phase 3C retrofit)
 - Every other Phoenix tool: uses the default (no kwarg required)
 
 Adding new variant-allowed slots requires a **new ADR

@@ -262,8 +262,8 @@ Run through this before merging any UI change:
 | Item | Phase | Notes |
 |------|-------|-------|
 | `phoenix_commons.theme.tokens` module | 2.5 ✅ landed | Canonical token home; mirrors the QSS-file palette per Phase 2.5. |
-| `BrandProfile` mechanism + sentinel-form QSS | 3+ (TBD) | Implements ADR-016. Adds `apply_dark_theme(app, brand=...)` kwarg; sentinel-substitutes `__BRAND_PRIMARY__` / `__BRAND_SECONDARY__` / `__BRAND_ACCENT__` at apply time. |
-| PCC retrofit registering its brand profile | 3C | Per ADR-016 § 9. |
+| `BrandProfile` mechanism + sentinel-form QSS | 3A ✅ landed | Implements ADR-016. `apply_dark_theme(app, brand=...)` kwarg sentinel-substitutes `__BRAND_PRIMARY__` / `__BRAND_SECONDARY__` / `__BRAND_ACCENT__` at apply time. Default profile preserves canonical Phoenix red + deep blue + blue. |
+| PCC retrofit registering its brand profile | 3C | Per ADR-016 § 9. The mechanism is now in place; PCC's retrofit just registers `BrandProfile(primary="#E8783C", secondary="#3CB8AE", accent="#3CB8AE")`. |
 | Auto-generated component gallery | 9 | Snapshot screenshots of every widget in every state. |
 | Light-mode palette | not planned | Phoenix apps are dark-mode by design. ADR-011 deferred indefinitely. |
 | WCAG audit | 9 | All brand-accent / status combos against text colours, per brand profile. |

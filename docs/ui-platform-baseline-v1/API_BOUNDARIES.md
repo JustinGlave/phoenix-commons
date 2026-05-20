@@ -54,7 +54,15 @@ from phoenix_commons.theme.tokens import (
     SEMANTIC_COLORS,
     # PCC-compatible alias
     C,
+    # ADR-016 brand-profile mechanism (Phase 3A)
+    BrandProfile,
+    DEFAULT_BRAND,
 )
+
+# apply_dark_theme accepts an optional BrandProfile per ADR-016:
+from phoenix_commons.theme import apply_dark_theme
+# apply_dark_theme(app)                          → uses DEFAULT_BRAND
+# apply_dark_theme(app, brand=BrandProfile(...))  → custom brand
 ```
 
 ### Icons
