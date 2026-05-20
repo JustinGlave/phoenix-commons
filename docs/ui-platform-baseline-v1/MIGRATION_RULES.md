@@ -16,7 +16,7 @@ the original "two tools at once" framing was relaxed):
 
 | Phase | Tool | Branch name | Status |
 |-------|------|-------------|--------|
-| **3A** | Phoenix CAD Tool (Lab Layout Tool) | `phase-3a-phoenix-cad-retrofit` | ✅ Landed 2026-05-19 (awaiting merge approval) |
+| **3A** | Phoenix CAD Tool (Lab Layout Tool) | `phase-3a-phoenix-cad-retrofit` | ✅ Merged 2026-05-19 (merge commit `79c7003` on `lab-layout-tool:master`). Retrofit branch preserved on origin per MIGRATION_RULES § Per-retrofit branch + PR convention. |
 | **3B** | Phoenix Checkout Tool | `phase-3b-phoenix-checkout-retrofit` | Not started — gated by Phase 3A merge + user approval |
 | **3C** | Phoenix Command Center | `phase-3c-pcc-retrofit` | Not started — gated by Phase 3A merge + PCC palette ADR implementation (ADR-016 mechanism is ready in commons; PCC just registers its BrandProfile) |
 | **8a** | ValveMasterTool | `phase-8a-valvemaster-retrofit` | Not started — System B → A visible-theme swap |
