@@ -1,10 +1,24 @@
-"""tokens.py — Phoenix System A canonical palette.
+"""tokens.py — Phoenix System A canonical palette + brand-profile mechanism.
 
 The single source of truth for every named colour value used across
 the Phoenix UI Platform. Other modules (the QSS file, the icon
 loader, the QPalette setup in :mod:`phoenix_commons.theme.apply`,
 future widgets) consume these constants rather than redefining hex
 literals inline.
+
+Per ADR-016 (Phase 3A landed the mechanism), tokens fall into two
+tiers:
+
+* **Locked** (BG, SURFACE, SURFACE_ALT, TEXT, MUTED, SUCCESS,
+  WARNING, ERROR) — apps may NOT override these at runtime.
+  Accessibility / semantic / structural — drift here is a
+  design-system fork.
+* **Brand-profile variant-allowed** (PRIMARY, SECONDARY, ACCENT,
+  with INFO aliased to ACCENT) — apps may override via the
+  :class:`BrandProfile` mechanism below. Phoenix CAD / Job Tracker /
+  Phoenix Checkout / ValveMaster (post Phase 8a) use the default
+  profile; PCC registers a custom profile (orange + teal) when its
+  retrofit lands.
 
 **The forbidden anti-pattern:**
 
@@ -49,6 +63,8 @@ established by Phoenix CAD's ``ui/style.py`` and embedded in
 not represented here.
 """
 from __future__ import annotations
+
+from dataclasses import dataclass
 
 
 # ---------------------------------------------------------------------------
@@ -115,13 +131,70 @@ SEMANTIC_COLORS: dict[str, str] = {
 C: dict[str, str] = SEMANTIC_COLORS
 
 
+# ---------------------------------------------------------------------------
+# BrandProfile — the controlled accent-override mechanism per ADR-016.
+#
+# Three named brand-token slots (PRIMARY / SECONDARY / ACCENT) which
+# apps may override at apply time. Locked tokens are NOT included
+# here and cannot be overridden.
+#
+# Default values match the canonical constants above (red + deep blue
+# + blue). PCC registers its own profile (orange + teal + teal); every
+# other Phoenix tool uses ``DEFAULT_BRAND``.
+#
+# Usage pattern (consuming apps):
+#
+#     # Phoenix CAD / Job Tracker / Phoenix Checkout / ValveMaster:
+#     apply_dark_theme(app)  # uses DEFAULT_BRAND implicitly
+#
+#     # PCC (when its retrofit lands):
+#     PCC_BRAND = BrandProfile(
+#         primary   = "#E8783C",
+#         secondary = "#3CB8AE",
+#         accent    = "#3CB8AE",
+#     )
+#     apply_dark_theme(app, brand=PCC_BRAND)
+#
+# The QSS substitution happens inside ``apply_dark_theme`` — see
+# :mod:`phoenix_commons.theme.apply`. ``phoenix_style.qss`` carries
+# sentinel tokens (``__BRAND_PRIMARY__`` etc.) that get string-
+# substituted with the active profile's hex values at apply time.
+# ---------------------------------------------------------------------------
+
+@dataclass(frozen=True)
+class BrandProfile:
+    """Controlled accent-override profile per ADR-016.
+
+    Three named slots. Defaults match commons canonical
+    (:data:`PRIMARY` / :data:`SECONDARY` / :data:`ACCENT`). Frozen
+    so accidental mutation can't drift a tool's brand at runtime.
+
+    Adding a fourth slot requires a new ADR superseding ADR-016
+    (the closed slot list is intentional — it bounds the
+    divergence surface).
+    """
+
+    primary:   str = PRIMARY
+    secondary: str = SECONDARY
+    accent:    str = ACCENT
+
+
+#: The commons-canonical brand profile. Used when ``apply_dark_theme``
+#: is called without a ``brand=`` kwarg.
+DEFAULT_BRAND: BrandProfile = BrandProfile()
+
+
 __all__ = [
-    # Module-level constants
+    # Module-level constants — locked tokens
     "BG", "SURFACE", "SURFACE_ALT",
-    "PRIMARY", "SECONDARY", "ACCENT",
     "TEXT", "MUTED",
-    "SUCCESS", "WARNING", "ERROR", "INFO",
+    "SUCCESS", "WARNING", "ERROR",
+    # Module-level constants — variant-allowed defaults
+    "PRIMARY", "SECONDARY", "ACCENT", "INFO",
     # Dict APIs
     "SEMANTIC_COLORS",
     "C",
+    # Brand-profile mechanism (ADR-016)
+    "BrandProfile",
+    "DEFAULT_BRAND",
 ]

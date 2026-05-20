@@ -14,6 +14,8 @@ from __future__ import annotations
 
 import re
 
+import pytest
+
 
 # Six-digit lowercase hex. The tokens module commits to one canonical
 # form across the platform — the icons recolour code and any future
@@ -121,5 +123,97 @@ def test_all_export_matches_public_surface() -> None:
         "TEXT", "MUTED",
         "SUCCESS", "WARNING", "ERROR", "INFO",
         "SEMANTIC_COLORS", "C",
+        # Phase 3A — ADR-016 brand-profile mechanism
+        "BrandProfile", "DEFAULT_BRAND",
     }
     assert set(tokens.__all__) == expected
+
+
+# ---------------------------------------------------------------------------
+# Phase 3A — BrandProfile mechanism (ADR-016)
+# ---------------------------------------------------------------------------
+
+
+def test_brand_profile_default_matches_canonical_constants() -> None:
+    """``BrandProfile()`` defaults must mirror ``PRIMARY/SECONDARY/ACCENT``."""
+    from phoenix_commons.theme.tokens import (
+        ACCENT, BrandProfile, PRIMARY, SECONDARY,
+    )
+
+    bp = BrandProfile()
+    assert bp.primary == PRIMARY
+    assert bp.secondary == SECONDARY
+    assert bp.accent == ACCENT
+
+
+def test_default_brand_is_a_brand_profile() -> None:
+    """``DEFAULT_BRAND`` is a ``BrandProfile`` instance with canonical values."""
+    from phoenix_commons.theme.tokens import (
+        ACCENT, BrandProfile, DEFAULT_BRAND, PRIMARY, SECONDARY,
+    )
+
+    assert isinstance(DEFAULT_BRAND, BrandProfile)
+    assert DEFAULT_BRAND.primary == PRIMARY
+    assert DEFAULT_BRAND.secondary == SECONDARY
+    assert DEFAULT_BRAND.accent == ACCENT
+
+
+def test_brand_profile_is_frozen() -> None:
+    """``BrandProfile`` must be immutable so apps can't mutate at runtime.
+
+    Frozen-dataclass enforcement keeps brand-profile drift impossible
+    after an app registers its profile.
+    """
+    import dataclasses
+    from phoenix_commons.theme.tokens import BrandProfile, DEFAULT_BRAND
+
+    # Verify the dataclass is frozen.
+    assert getattr(BrandProfile, "__dataclass_params__").frozen is True
+
+    # And mutation actually fails.
+    with pytest.raises(dataclasses.FrozenInstanceError):
+        DEFAULT_BRAND.primary = "#000000"  # type: ignore[misc]
+
+
+def test_brand_profile_only_accepts_three_named_slots() -> None:
+    """Adding a fourth slot must raise — closed slot list per ADR-016.
+
+    If someone tries ``BrandProfile(primary=..., extra="...")`` it
+    must fail at construction time. Otherwise we'd silently accept
+    arbitrary tokens and open the "stealth fourth slot" risk
+    documented in ADR-016 § 10.
+    """
+    from phoenix_commons.theme.tokens import BrandProfile
+
+    with pytest.raises(TypeError):
+        BrandProfile(primary="#000000", extra="#ffffff")  # type: ignore[call-arg]
+
+
+def test_pcc_style_brand_profile_resolves() -> None:
+    """A non-default profile (PCC's orange + teal) constructs cleanly.
+
+    This is the exact pattern PCC's retrofit (Phase 3C) will use.
+    Pinning it as a test prevents the constructor signature from
+    drifting between now and then.
+    """
+    from phoenix_commons.theme.tokens import BrandProfile, DEFAULT_BRAND
+
+    pcc = BrandProfile(
+        primary="#E8783C",
+        secondary="#3CB8AE",
+        accent="#3CB8AE",
+    )
+    assert pcc.primary == "#E8783C"
+    assert pcc.secondary == "#3CB8AE"
+    assert pcc.accent == "#3CB8AE"
+    assert pcc != DEFAULT_BRAND
+
+
+def test_brand_profile_partial_override_works() -> None:
+    """Overriding only one slot is allowed; others fall back to defaults."""
+    from phoenix_commons.theme.tokens import BrandProfile, PRIMARY, SECONDARY
+
+    bp = BrandProfile(accent="#000000")
+    assert bp.primary == PRIMARY
+    assert bp.secondary == SECONDARY
+    assert bp.accent == "#000000"
