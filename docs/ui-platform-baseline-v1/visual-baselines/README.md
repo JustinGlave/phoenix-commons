@@ -150,6 +150,11 @@ A" is what produced the drift in the first place.
 - `../PLATFORM_CONTRACT.md` — ownership map
 - `../DESIGN_SYSTEM.md` — the design-system reference (also one
   side of the palette divergence noted above)
+- `../BRANDING_ASSET_GUIDE.md` — brand asset inventory + the
+  "four colors" (orange / green / blue / red) per-tool pattern.
+  Complementary to the palette discussion above: this README
+  covers the QSS / `theme.py` divergence; the asset guide covers
+  the icon/logo asset divergence.
 - `../production-inventory.md` — the source for all "Identity"
   table values in each per-app baseline
 - `../STABILIZATION_REPORT_06.md` — Phase 2.7 deliverable
