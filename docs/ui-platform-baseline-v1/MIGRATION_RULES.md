@@ -453,8 +453,6 @@ Stop conditions section.
 
 ## Rollback policy
 
-## Rollback policy
-
 | Failure during retrofit | Action |
 |--------------------------|--------|
 | Compileall or pytest fails on the retrofit branch | Fix on the branch; do not merge. |
@@ -463,9 +461,18 @@ Stop conditions section.
 | User-data loss reproduced on upgrade | **Hard stop.** Revert immediately. Patch `paths.user_data_dir` or migration code; do not retry until cause confirmed. |
 | Theme regression discovered post-merge | Hotfix release with the legacy QSS dropped back in as app-local file; retrofit re-attempted later. |
 
-A retrofit PR is **always revertable as a single git revert**. This
-is non-negotiable. If a retrofit needs more than one commit, squash
-them in the PR before merge.
+A merged retrofit is **always revertable as a single
+`git revert -m 1 <merge-sha>`** against the `--no-ff` merge commit
+produced by § Per-retrofit branch + PR convention. This is
+non-negotiable.
+
+The small-commit history within the retrofit branch (the B1–Bn
+commits described in § 8) is **preserved** on origin for forensic
+inspection — rollback acts on the merge commit, not on the
+individual retrofit commits. This means the retrofit branch's
+internal commits are NOT squashed before merge; the `--no-ff`
+strategy keeps both fine-grained bisect history AND single-revert
+rollback simultaneously.
 
 ## Screenshot baseline requirements
 

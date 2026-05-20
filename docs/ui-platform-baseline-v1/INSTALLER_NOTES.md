@@ -249,3 +249,11 @@ worth knowing about:
 - `BRANDING_ASSET_GUIDE.md` — icon / wizard image sourcing.
 - `production-inventory.md` (one level up in `docs/`) — frozen
   snapshot of each tool's installer config.
+- `FROZEN_BUILD_BASELINE.md` — canonical frozen-build configuration
+  that produces the bootloader Inno Setup compresses.
+- `DECISIONS.md` § ADR-014 — Python 3.12 as the platform canonical
+  version (build venv mandate).
+- `BUILD_HARDENING_EXPERIMENT_REPORT_03.md` — empirical evidence
+  that Python 3.14 bootloaders trigger S1 quarantine while 3.12
+  bootloaders do not.
+- `BLOCKERS.md` § 1 — S1 quarantine blocker history.
