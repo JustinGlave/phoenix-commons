@@ -44,6 +44,7 @@ class UnknownColorError(ValueError):
 ICON_NAMES: frozenset[str] = frozenset({
     "arrow-left",
     "check",
+    "clock",
     "code",
     "external-link",
     "file-text",
