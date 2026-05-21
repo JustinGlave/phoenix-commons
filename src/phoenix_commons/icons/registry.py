@@ -53,6 +53,7 @@ ICON_NAMES: frozenset[str] = frozenset({
     "info",
     "layout-dashboard",
     "package",
+    "pin",
     "play",
     "plus",
     "refresh",
