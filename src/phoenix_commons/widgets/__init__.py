@@ -8,6 +8,7 @@ Public API:
     Containers:     Panel
     Tables:         PhoenixTable
     Banners:        UpdateBanner
+    Status:         StatusBadge
     Layout helper:  button_row
 
 The ``no_scroll`` submodule (``NoScrollComboBox``, ``NoScrollSpinBox``,
@@ -26,6 +27,7 @@ from phoenix_commons.widgets.buttons import (
 )
 from phoenix_commons.widgets.helpers import button_row
 from phoenix_commons.widgets.panel import Panel
+from phoenix_commons.widgets.status_badge import StatusBadge
 from phoenix_commons.widgets.table import PhoenixTable
 from phoenix_commons.widgets.typography import (
     HintLabel,
@@ -45,6 +47,7 @@ __all__ = [
     "HintLabel",
     "Panel",
     "PhoenixTable",
+    "StatusBadge",
     "UpdateBanner",
     "button_row",
 ]
