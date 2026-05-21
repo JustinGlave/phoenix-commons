@@ -42,7 +42,9 @@ class UnknownColorError(ValueError):
 # Keep alphabetised. Each entry has a corresponding ``lucide/<name>.svg``.
 # ---------------------------------------------------------------------------
 ICON_NAMES: frozenset[str] = frozenset({
+    "arrow-down",
     "arrow-left",
+    "arrow-up",
     "check",
     "clock",
     "code",
