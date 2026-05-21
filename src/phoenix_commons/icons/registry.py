@@ -43,7 +43,10 @@ class UnknownColorError(ValueError):
 # ---------------------------------------------------------------------------
 ICON_NAMES: frozenset[str] = frozenset({
     "check",
+    "git-branch",
     "info",
+    "layout-dashboard",
+    "package",
     "plus",
     "refresh",
     "save",
