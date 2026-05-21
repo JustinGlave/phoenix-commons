@@ -184,6 +184,90 @@ class BrandProfile:
 DEFAULT_BRAND: BrandProfile = BrandProfile()
 
 
+# ---------------------------------------------------------------------------
+# Per-tool brand colors — for activity-feed tag pills and any future
+# cross-tool surface where "which tool produced this event" needs to
+# be glanceable.
+#
+# Keyed by canonical short identifier (normalised via the rules in
+# :func:`color_for_tool`). Values match each app's brand-mark color
+# from the rollout's INVENTORY.md, except where two tools would clash
+# (LLT and PCC are both warm orange family — LLT gets the deeper
+# amber to keep them distinguishable).
+#
+# Not an ADR-016 brand-profile mechanism. This map is a UI lookup
+# table for tinting cross-tool surfaces. Per-app theming still goes
+# through BrandProfile.
+# ---------------------------------------------------------------------------
+
+TOOL_BRAND_COLORS: dict[str, str] = {
+    # Platform / commons — teal (matches PCC's brand accent so the
+    # platform layer reads as a single visual entity).
+    "commons":         "#3cb8ae",
+    # Phoenix Checkout Tool — green (brand-mark sticker).
+    "checkout":        "#4ec47a",
+    # Project Tracking Tool — blue (brand-mark sticker).
+    "project-tracker": "#3b82f6",
+    # "Job Tracker" is the operator-facing display name for PTT;
+    # keep its colour aligned.
+    "job-tracker":     "#3b82f6",
+    # Lab Layout Tool / Phoenix CAD Tool — amber. Distinct from
+    # PCC's primary orange (#E8783C) so the two don't read as the
+    # same tool in the activity feed.
+    "lab-layout":      "#f59e0b",
+    "cad":             "#f59e0b",
+    # Phoenix Master Tool — magenta (brand-mark sticker).
+    "master":          "#c0398c",
+    # Phoenix Command Center — PCC's brand primary (orange).
+    # Activity events from PCC itself surface as orange tags.
+    "command-center":  "#e8783c",
+    # ValveMaster — purple. INVENTORY.md left this TBD; allocated
+    # here as a distinct hue so the tag is recognisable.
+    "valvemaster":     "#7c5bcc",
+}
+
+
+def color_for_tool(name: str, default: str = "#94a3b8") -> str:
+    """Look up the activity-feed tag color for a Phoenix tool.
+
+    Normalisation pipeline (so the lookup tolerates the many ways
+    a tool name appears across the platform):
+
+    1. Lowercase + replace spaces/underscores with dashes.
+    2. Strip a leading ``phoenix-`` prefix (the shared family
+       namespace; the distinguishing part is the suffix).
+    3. Strip a trailing ``-tool`` suffix (so ``checkout-tool``
+       matches ``checkout``).
+    4. Exact-match lookup against :data:`TOOL_BRAND_COLORS`.
+    5. Substring fallback — covers no-separator variants like
+       ``valvemastertool`` (matches ``valvemaster``).
+    6. ``default`` (muted slate) when nothing matches.
+
+    Args:
+        name: Raw tool name (e.g. ``"phoenix-commons"``,
+            ``"Phoenix Cad Tool"``, ``"ValveMasterTool"``).
+        default: Fallback hex when the tool isn't in the map.
+
+    Returns:
+        Hex color string (``"#rrggbb"``).
+    """
+    s = name.strip().lower().replace("_", "-").replace(" ", "-")
+    if s.startswith("phoenix-"):
+        s = s[len("phoenix-"):]
+    if s.endswith("-tool"):
+        s = s[: -len("-tool")]
+    if s in TOOL_BRAND_COLORS:
+        return TOOL_BRAND_COLORS[s]
+    # Substring fallback — catches "valvemastertool", "cad-tool-v2",
+    # and similar tokens that don't fall cleanly through the strips.
+    # Iterate longest keys first so "valvemaster" matches before
+    # "master" (which is a substring of "valvemaster").
+    for key in sorted(TOOL_BRAND_COLORS, key=len, reverse=True):
+        if key in s:
+            return TOOL_BRAND_COLORS[key]
+    return default
+
+
 __all__ = [
     # Module-level constants — locked tokens
     "BG", "SURFACE", "SURFACE_ALT",
@@ -197,4 +281,7 @@ __all__ = [
     # Brand-profile mechanism (ADR-016)
     "BrandProfile",
     "DEFAULT_BRAND",
+    # Per-tool color lookup (Step 4)
+    "TOOL_BRAND_COLORS",
+    "color_for_tool",
 ]

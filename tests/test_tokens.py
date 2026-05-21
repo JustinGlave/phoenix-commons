@@ -125,6 +125,8 @@ def test_all_export_matches_public_surface() -> None:
         "SEMANTIC_COLORS", "C",
         # Phase 3A — ADR-016 brand-profile mechanism
         "BrandProfile", "DEFAULT_BRAND",
+        # Phase 3C Step 4 — per-tool activity tag colours
+        "TOOL_BRAND_COLORS", "color_for_tool",
     }
     assert set(tokens.__all__) == expected
 
@@ -217,3 +219,123 @@ def test_brand_profile_partial_override_works() -> None:
     assert bp.primary == PRIMARY
     assert bp.secondary == SECONDARY
     assert bp.accent == "#000000"
+
+
+# ---------------------------------------------------------------------------
+# Phase 3C Step 4 — TOOL_BRAND_COLORS + color_for_tool
+# ---------------------------------------------------------------------------
+
+
+def test_tool_brand_colors_covers_every_shipping_tool() -> None:
+    """The map must include all known Phoenix tools.
+
+    INVENTORY.md from the rollout enumerates the five deployed tools
+    + PCC + commons. Each gets a colour. ValveMaster's colour was
+    TBD in INVENTORY; the Step 4 brief allocated one here.
+    """
+    from phoenix_commons.theme.tokens import TOOL_BRAND_COLORS
+
+    expected_keys = {
+        "commons",
+        "checkout",
+        "project-tracker",
+        "job-tracker",
+        "lab-layout",
+        "cad",
+        "master",
+        "command-center",
+        "valvemaster",
+    }
+    assert expected_keys.issubset(set(TOOL_BRAND_COLORS))
+
+
+def test_tool_brand_colors_values_are_six_digit_hex() -> None:
+    """Every TOOL_BRAND_COLORS value matches #rrggbb."""
+    from phoenix_commons.theme.tokens import TOOL_BRAND_COLORS
+
+    for key, value in TOOL_BRAND_COLORS.items():
+        assert _HEX_RE.match(value), (
+            f"TOOL_BRAND_COLORS[{key!r}]={value!r} must be lowercase 6-digit hex"
+        )
+
+
+def test_color_for_tool_exact_match() -> None:
+    from phoenix_commons.theme.tokens import (
+        color_for_tool, TOOL_BRAND_COLORS,
+    )
+
+    assert color_for_tool("commons") == TOOL_BRAND_COLORS["commons"]
+    assert color_for_tool("checkout") == TOOL_BRAND_COLORS["checkout"]
+    assert color_for_tool("master") == TOOL_BRAND_COLORS["master"]
+
+
+def test_color_for_tool_strips_phoenix_prefix() -> None:
+    """Tool names with a "phoenix-" / "Phoenix " prefix resolve."""
+    from phoenix_commons.theme.tokens import (
+        color_for_tool, TOOL_BRAND_COLORS,
+    )
+
+    assert color_for_tool("phoenix-commons") == TOOL_BRAND_COLORS["commons"]
+    assert color_for_tool("Phoenix Checkout Tool") == TOOL_BRAND_COLORS["checkout"]
+    assert color_for_tool("phoenix_master_tool") == TOOL_BRAND_COLORS["master"]
+
+
+def test_color_for_tool_strips_tool_suffix() -> None:
+    """Tool names with a trailing "-tool" suffix resolve."""
+    from phoenix_commons.theme.tokens import (
+        color_for_tool, TOOL_BRAND_COLORS,
+    )
+
+    assert color_for_tool("checkout-tool") == TOOL_BRAND_COLORS["checkout"]
+    assert color_for_tool("Phoenix Cad Tool") == TOOL_BRAND_COLORS["cad"]
+
+
+def test_color_for_tool_case_insensitive() -> None:
+    from phoenix_commons.theme.tokens import (
+        color_for_tool, TOOL_BRAND_COLORS,
+    )
+
+    assert color_for_tool("COMMONS") == TOOL_BRAND_COLORS["commons"]
+    assert color_for_tool("ValveMaster") == TOOL_BRAND_COLORS["valvemaster"]
+
+
+def test_color_for_tool_substring_fallback() -> None:
+    """No-separator tokens fall through the substring fallback.
+
+    "valvemastertool" → strip "-tool" doesn't match (no leading dash);
+    substring fallback finds "valvemaster" inside the name.
+    """
+    from phoenix_commons.theme.tokens import (
+        color_for_tool, TOOL_BRAND_COLORS,
+    )
+
+    assert color_for_tool("ValveMasterTool") == TOOL_BRAND_COLORS["valvemaster"]
+    assert color_for_tool("valvemastertool") == TOOL_BRAND_COLORS["valvemaster"]
+
+
+def test_color_for_tool_unknown_returns_default() -> None:
+    """Tools that aren't in the map return the muted slate default."""
+    from phoenix_commons.theme.tokens import color_for_tool
+
+    assert color_for_tool("never-heard-of-this") == "#94a3b8"
+    assert color_for_tool("xyz") == "#94a3b8"
+
+
+def test_color_for_tool_custom_default() -> None:
+    """`default` kwarg overrides the fallback when no match is found."""
+    from phoenix_commons.theme.tokens import color_for_tool
+
+    assert color_for_tool("never-heard", default="#000000") == "#000000"
+    # And known tools still resolve, ignoring the default.
+    from phoenix_commons.theme.tokens import TOOL_BRAND_COLORS
+    assert color_for_tool("commons", default="#000000") == TOOL_BRAND_COLORS["commons"]
+
+
+def test_color_for_tool_no_phoenix_no_strip() -> None:
+    """Tools without the phoenix prefix still resolve directly."""
+    from phoenix_commons.theme.tokens import (
+        color_for_tool, TOOL_BRAND_COLORS,
+    )
+
+    # Job Tracker has no phoenix prefix; resolves on first lookup.
+    assert color_for_tool("Job Tracker") == TOOL_BRAND_COLORS["job-tracker"]
