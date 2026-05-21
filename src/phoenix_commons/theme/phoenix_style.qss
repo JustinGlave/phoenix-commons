@@ -434,6 +434,35 @@ QHeaderView::section:hover {
     background-color: #1f2937;
 }
 
+/* ----------------------------------------------------------------------------
+   PCC dashboard tools table — quieter header treatment.
+   Targets QTableWidget#dashboardToolsTable specifically (Phoenix
+   Command Center's primary surface). The default QHeaderView::section
+   above stays in place for every other consumer (Phoenix CAD, Phoenix
+   Checkout, etc.) — only this one widget gets the lighter chrome.
+   ---------------------------------------------------------------------------- */
+
+QTableWidget#dashboardToolsTable {
+    background: transparent;
+    border: none;
+}
+
+QTableWidget#dashboardToolsTable QHeaderView::section {
+    background: transparent;
+    color: #94a3b8;
+    border: none;
+    border-bottom: 1px solid #2d3748;
+    padding: 8px 8px 6px 8px;
+    font-size: 9pt;
+    font-weight: 600;
+    letter-spacing: 0.6px;
+}
+
+QTableWidget#dashboardToolsTable QHeaderView::section:hover {
+    background: transparent;
+    color: #cbd5e1;
+}
+
 /* ============================================================================
    TREE WIDGET (sidebar nav)
    ============================================================================ */
