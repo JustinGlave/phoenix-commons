@@ -479,35 +479,35 @@ The `--no-ff` merge commit preserves the entire Phase 3D commit history as a sid
 
 ## 7. Recommended Phase 3E timing
 
-### 7.1 Phase 3D status confirms readiness for the next retrofit
+### 7.1 Phase 3D does not automatically schedule Wave 8a
 
 Per MIGRATION_RULES § Frequency limits:
 
 | Wave | Cadence rule |
 |------|--------------|
-| Wave 8a (ValveMaster) | At least 2 weeks **after** the pilot's last merge. |
-| Wave 8b (Job Tracker) | At least 2 weeks after Wave 8a. |
+| Wave 8a (ValveMaster) | At least 2 weeks **after** the prior other-tool retrofit's merge. |
+| Wave 8b (Job Tracker) | At least 2 weeks after Wave 8a's merge. |
 
-Phase 3C closed `2026-05-21`. Phase 3D closes the same day (this report's date). The cadence rule treats both as PCC modernizations — they share the same tool's repo — so Phase 3D's merge does not reset the 2-week clock on **Wave 8a / 8b** (other-tool retrofits).
+**Phase 3D's merge does not start Wave 8a.** Wave 8a remains **operator-gated**. The doctrine sets a *cooldown floor*; it does not authorise the next retrofit on its own.
 
-Wave 8a (ValveMaster) earliest start: **2026-06-04** (2 weeks after Phase 3B Phoenix Checkout merged 2026-05-19) — already past the gate; no additional spacing needed for ValveMaster.
+Cooldown floor for Wave 8a, measured from the prior other-tool retrofit's merge:
 
-### 7.2 Phase 3E — there is none scheduled
+  - Phase 3B (Phoenix Checkout) merged **2026-05-19** per MIGRATION_RULES § Migration order.
+  - Doctrinal cooldown = 14 days.
+  - Earliest doctrinal date for Wave 8a to open = **2026-06-02**.
+  - Today is 2026-05-22; the cooldown floor is therefore **~11 days out**, not past.
 
-Phase 3D's spec scope was the **detail panel**. With it shipped + closed, the next logical PCC-side modernization candidates would be:
+Phase 3D is a PCC-side modernization (same tool as Phase 3C). Per the doctrine's "other-tool" framing, Phase 3D's merge does **not** reset the Wave-8a clock — but it also does **not** advance it. The 14-day floor still attaches to Phase 3B's date.
 
-  - **Commons Browser surface** — currently still pre-retrofit. Phase 3E candidate.
-  - **Settings dialog** — still uses raw QDialog + inline-styled chrome. Phase 3E candidate.
-  - **New Tool Wizard** — partially modernised; could finish per Phase-3-conventions.
-  - **About dialog** — small, already absorbed Lucide hero icon in Phase 3C; minimal remaining debt.
+### 7.2 Phase 3E — none scheduled
 
-These are **future polish phases**, not scheduled. The operator decides whether to open any of them; none block Wave 8a or 8b.
+Phase 3D's spec scope was the **detail panel**. With it shipped + closed, future PCC-side polish candidates exist (Commons Browser modernization, Settings dialog, New Tool Wizard, About dialog) but **none are scheduled.** Each would be opened only on explicit operator decision.
 
 ### 7.3 Recommendation
 
   - **Immediate:** execute the §6 merge plan on operator approval.
-  - **Short-term (next 1-2 weeks):** Wave 8a (ValveMaster) retrofit — long-deferred grey→navy System-B→A theme swap. Per MIGRATION_RULES § Migration order, this is the next scheduled retrofit. Phase 3D status does not block it.
-  - **Medium-term:** evaluate whether Phase 3E (Commons Browser modernization or Settings dialog modernization) is worth opening. Default: defer until operator workflow demands surface improvement.
+  - **Wave 8a:** remains operator-gated. The doctrinal cooldown floor (≥ 2026-06-02) gives the earliest defensible open date; opening on or after that date is the operator's call.
+  - **Phase 3E:** not scheduled. Opening is the operator's call.
   - **No new architecture changes scheduled.** Commons API is stable; BrandProfile is stable; ADR-016 + ADR-014 + ADR-015 all hold.
 
 ---
