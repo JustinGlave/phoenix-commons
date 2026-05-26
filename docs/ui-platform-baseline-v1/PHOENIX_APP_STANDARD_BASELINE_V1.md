@@ -56,26 +56,35 @@ Authoritative: `ADR_PCC_PALETTE_RECONCILIATION.md` (ADR-016), `DESIGN_SYSTEM.md`
 
 ### 1.3 Primitives — closed set
 
-Every Phoenix app uses the commons primitive vocabulary. The closed set as of 2026-05-22:
+Every Phoenix app uses the commons primitive vocabulary. The closed set verified against `phoenix_commons.widgets.__all__` as of 2026-05-22:
 
 | Primitive | Use |
 |-----------|-----|
 | `Panel` | Rounded-card chrome wrapper for sections (dashboard panels, dialog cards, detail-panel surfaces, UsageFooter) |
 | `StatusBadge` | Coloured pill conveying operational state. Closed 7-variant set: `clean` / `dirty` / `error` / `warning` / `unknown` / `scanning` / `syncing`. Supports `compact=True` for dense rows |
-| `AggregateTile` | Dashboard metric tile with leading Lucide icon + subtitle |
 | `PrimaryButton` | Red brand-primary; the surface's most operator-critical action. ≤1 per surface |
 | `SecondaryButton` | Deep-blue brand-secondary; supporting operations (Pull/Push/Fetch, Run source, etc.) |
 | `TertiaryButton` | Outline tier; navigation/inspection actions (Back, VS Code, GitHub, Rescan, Cancel, Browse) |
 | `PhoenixTable` | Comparison-grid table (dashboard tools table) |
 | `UpdateBanner` | Auto-update notification banner |
-| `no_scroll` family | `NoScrollComboBox`, `NoScrollSpinBox`, `NoScrollDoubleSpinBox`, `NoScrollDateEdit` for scrollable forms |
-| `button_row` helper | Right-aligned action button row composition |
+| `PageTitle` / `PageSubtitle` / `SectionTitle` / `HintLabel` | Typography widget classes — apps may use either these classes directly OR the `#pageTitle` / `#sectionHeader` object-name convention against the commons canonical QSS (see §1.5) |
+| `phoenix_commons.widgets.no_scroll.*` | `NoScrollComboBox`, `NoScrollSpinBox`, `NoScrollDoubleSpinBox`, `NoScrollDateEdit` for scrollable forms (imported from the `no_scroll` submodule, not the `widgets` package root) |
+| `button_row` helper (function) | Right-aligned action button row composition |
 
   - **Apps MUST use these primitives** for any chrome element they cover.
   - **Apps MUST NOT recreate them** as local QFrame/QLabel subclasses with inline `setStyleSheet`.
   - **A new primitive enters this set only via a commons PR** with documented two-consumer evidence per MIGRATION_RULES § 0 (pre-flight commons-API gap inventory).
 
-Authoritative: `COMPONENT_CONTRACT.md`, `phoenix_commons.widgets` public API.
+#### App-local primitives that are NOT in commons today
+
+Some primitives currently live in PCC (or another app) and are NOT mandatory cross-app commons primitives. They may be **promoted** to commons later only with documented two-consumer evidence:
+
+| App-local primitive | Current owner | Notes |
+|---------------------|---------------|-------|
+| `AggregateTile` | PCC `dashboard.py` | Dashboard metric tile with leading Lucide icon + subtitle. Used inside PCC by the dashboard tile row (Phase 3C Step 5) and the detail-panel tile row (Phase 3D Step 2 imported it from dashboard). **PCC reference pattern**, not a mandatory cross-app commons primitive. Promotion to commons requires a second-consumer commitment per the two-consumer-evidence rule. |
+| `SearchResultsPopup` | PCC `dashboard.py` | Floating result list under the Ctrl+K search input (Phase 3F). PCC-local; not a candidate for commons promotion since the search MVP itself is PCC-scoped. |
+
+Authoritative: `COMPONENT_CONTRACT.md`, `phoenix_commons.widgets.__all__` (the runtime source of truth).
 
 ### 1.4 Icons — Lucide only
 
@@ -427,7 +436,7 @@ Authoritative: `MIGRATION_RULES.md § Stop conditions`.
 ## 6. What every app MUST share
 
   - Dark navy System A theme (locked tokens)
-  - Commons primitives (Panel / StatusBadge / Primary / Secondary / TertiaryButton / PhoenixTable / UpdateBanner / AggregateTile / no_scroll family)
+  - Commons primitives from `phoenix_commons.widgets.__all__` (Panel / StatusBadge / Primary / Secondary / TertiaryButton / PhoenixTable / UpdateBanner / PageTitle / PageSubtitle / SectionTitle / HintLabel / button_row) and `phoenix_commons.widgets.no_scroll.*` (NoScroll* family)
   - Lucide icons (no emoji on chrome)
   - `#pageTitle` / `#sectionHeader` typography
   - 3-tier button hierarchy
