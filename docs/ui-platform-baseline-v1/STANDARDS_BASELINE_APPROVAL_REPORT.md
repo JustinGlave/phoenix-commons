@@ -168,7 +168,7 @@ These are surfaced from the readiness matrix § 8 + this audit. They do NOT bloc
 ### From the readiness matrix
 
   1. **Wave 8a target version.** Does ValveMaster bump `version.py` as part of the retrofit, or follow the Phase 3B tag-skip pattern?
-  2. **Wave 8a screenshot baseline.** Where to keep before/after screenshots for the high-visible-change theme swap?
+  2. **Wave 8a screenshot baseline.** Where to keep before/after screenshots for the (≈ 0% expected) light visual review at the merge gate?
   3. **Wave 8b Excel scope.** Does retrofit preserve the financials subsystem as preserved-local (hybrid facade), or does it warrant its own surface-spec doc?
   4. **Screenshot_Tool inclusion.** Skip permanently, defer until 8b closes, or add to `production-inventory.md` now?
   5. **Wave 8 cadence frequency.** MIGRATION_RULES § Frequency limits sets a 14-day floor; operator may want a longer interval.

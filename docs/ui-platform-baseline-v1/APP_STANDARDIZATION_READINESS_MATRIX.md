@@ -66,7 +66,7 @@ This matrix does NOT include deep code-level inspection of each candidate — th
 | **Doctrinal cooldown floor** | **2026-06-02** (14 days after Phase 3B's 2026-05-19 merge) |
 | **Blockers before implementation** | (a) Operator approval to open the phase; (b) confirm cooldown floor cleared; (c) pre-flight gap inventory of `inventory.py` / `assets.py` symbols against commons; (d) confirm `phoenix_master_pyside6.py` theme region is cleanly separable from domain logic |
 | **Estimated step count** | 6-8 small commits (B1 submodule + editable install, B2 paths facade, B3 updater facade, B4 theme retrofit + BrandProfile if needed, B5 widget retrofit, B6 build.bat alignment, B7+ frozen-build validation + visual review) |
-| **Expected scope per spec** | `MIGRATION_RULES` Migration order row predicts ~1-2 sessions; high visible change |
+| **Expected scope per spec** | `MIGRATION_RULES` Migration order row updated 2026-05-22 to reflect facade-only retrofit; ~1-2 sessions; **≈ 0% visible change** (Phoenix-CAD profile) per `WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md` |
 
 ---
 
@@ -147,7 +147,7 @@ This matrix does NOT include deep code-level inspection of each candidate — th
 
 ### Differences
 
-  - **ValveMaster has the highest visible change** (theme swap). Documents loudly in release notes.
+  - **ValveMaster / Phoenix Master Tool is already visually System A** (verified byte-match in `phoenix_style.qss` per the pre-flight audit). Wave 8a is a facade retrofit (commons-backed architecture alignment + build hardening + updater/theme/widget facades), NOT a visible theme swap. Expected visible change ≈ 0% (Phoenix-CAD profile). Release-note framing: facade retrofit.
   - **Job Tracker has the largest scope** (Excel integration + financials subsystem + `starter_package/` deletion in same PR).
   - **Screenshot_Tool is uninventoried** — needs operator decision on whether to include it in the cadence at all.
 
@@ -165,7 +165,7 @@ This matrix does NOT include deep code-level inspection of each candidate — th
 
 ### Why this order
 
-  - **Wave 8a first** because it's already doctrinally scheduled (`MIGRATION_RULES § Migration order`) and the high-visible-change swap is best handled before the operator forgets the visual cadence established in Phase 3C/3D/3E/3F/3G.
+  - **Wave 8a first** because it's already doctrinally scheduled (`MIGRATION_RULES § Migration order`) and ValveMaster is in the best shape of the remaining apps (theme already System A; facade-only retrofit; ≈ 0% expected visible change). Doing it first proves the standards baseline's retrofit pattern against the lowest-risk candidate before tackling Wave 8b's larger surface.
   - **Wave 8b second** because it's the largest surface and benefits most from doing Wave 8a's proof-of-pattern first.
   - **Screenshot_Tool last (if ever)** because its operator-visibility is unverified and it's not in `production-inventory.md`.
 
@@ -206,7 +206,7 @@ If the operator wants any of these revisited (e.g. PCC dialog polish, Phoenix CA
 Before Wave 8a opens, the operator should confirm:
 
   1. **Wave 8a target version.** Does ValveMaster bump `version.py` as part of the retrofit? If yes, to what? If no, tag-skip pattern (Phase 3B precedent).
-  2. **Wave 8a screenshot baseline.** Where to keep pre/post screenshots for the high-visible-change swap?
+  2. **Wave 8a screenshot baseline.** Where to keep pre/post screenshots for the (≈ 0% expected) light visual review at the merge gate?
   3. **Wave 8b Excel scope.** Does retrofit preserve the financials subsystem as-is (preserved-local under MIGRATION_RULES § 1 hybrid facade), or does it warrant its own surface-spec doc?
   4. **Screenshot_Tool inclusion.** Skip permanently, defer until 8b closes, or add to `production-inventory.md` now?
   5. **Wave 8 cadence frequency.** MIGRATION_RULES § Frequency limits sets a 14-day floor between retrofits. Operator may want a longer interval if production-user feedback windows are needed.

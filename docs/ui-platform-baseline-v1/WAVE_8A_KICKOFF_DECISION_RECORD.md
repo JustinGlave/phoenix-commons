@@ -41,8 +41,8 @@ Accept all defaults silently OR mark amendments inline. **Decisions with `operat
 |---|---|
 | **Decision** | `CLAUDE.md` says `requirements.txt` was added during the 2026-05-19 Operational Hardening Sprint, but the file is **not present** at repo root today (`Glob` of `requirements*` returns only `.venv/` paths). Was it deleted? Should B1 add it from scratch? |
 | **Default** | **Add at B1 from scratch.** The retrofit needs `requirements.txt` for the `-e ./commons` editable install + PySide6 pin. Either the file was deleted (operator may know why) or CLAUDE.md is stale; either way the retrofit adds it. Reconcile CLAUDE.md at the same commit if needed. |
-| **Operator approval** | `operator-must-confirm` — if there's a reason the file was deleted (e.g. intentional minimalism), operator should say so before B1. |
-| **Implementation implication** | New `requirements.txt` at B1 with: `PySide6==6.10.2`, `PySide6_Addons==6.10.2`, `PySide6_Essentials==6.10.2`, `shiboken6==6.10.2`, `-e ./commons`. New `requirements-dev.txt` with: `pyinstaller==6.20.0`, `pytest==8.3.4`, `pytest-qt==4.4.0`. |
+| **Operator approval** | ✅ **APPROVED** (2026-05-22) — Add `requirements.txt` and `requirements-dev.txt` from scratch in B1. If CLAUDE.md says they already existed, reconcile CLAUDE.md as needed. |
+| **Implementation implication** | New `requirements.txt` at B1 with: `PySide6==6.10.2`, `PySide6_Addons==6.10.2`, `PySide6_Essentials==6.10.2`, `shiboken6==6.10.2`, `-e ./commons`. New `requirements-dev.txt` with: `pyinstaller==6.20.0`, `pytest==8.3.4`, `pytest-qt==4.4.0`. CLAUDE.md reconciliation included in the same commit. |
 
 ---
 
@@ -52,8 +52,8 @@ Accept all defaults silently OR mark amendments inline. **Decisions with `operat
 |---|---|
 | **Decision** | Current `.github/workflows/test.yml` is on `ubuntu-latest` with Python `3.10/3.11/3.12` matrix ("intentional divergence" per CLAUDE.md). Family convention is `.github/workflows/ci.yml` on `windows-latest` with Python 3.12 only + commons submodule init + `import phoenix_commons` smoke. Preserve or normalize? |
 | **Default** | **Preserve `test.yml`; add a parallel `ci.yml` for the family convention.** Keep the existing ubuntu matrix per documented operator preference. Add a NEW `ci.yml` (windows-latest, Python 3.12, submodule init + import smoke) so the retrofit gets the family-standard signal without removing the existing operator-preferred matrix. |
-| **Operator approval** | `operator-must-confirm` — operator may prefer single-CI to avoid duplication; alternative is to merge the two into one matrixed workflow. |
-| **Implementation implication** | At B1: keep `test.yml` as-is; add `ci.yml` with the family pattern. Both pass on the retrofit branch tip. |
+| **Operator approval** | ✅ **APPROVED** (2026-05-22) — Preserve existing `test.yml`. Add parallel family-standard `ci.yml`. Do not delete or merge the existing Ubuntu matrix workflow unless a later specific issue appears. |
+| **Implementation implication** | At B1: keep `test.yml` as-is (ubuntu-latest, Py 3.10/3.11/3.12 matrix); add NEW `ci.yml` with the family pattern (windows-latest, Py 3.12, `submodules: recursive` checkout, `import phoenix_commons` smoke, compileall, pytest). Both workflows must pass on the retrofit branch tip before merge. |
 
 ---
 
@@ -151,29 +151,37 @@ Accept all defaults silently OR mark amendments inline. **Decisions with `operat
 |---|---|
 | **Decision** | Earliest defensible open per MIGRATION_RULES § Frequency limits is **2026-06-02** (today is 2026-05-22; floor is 11 days out). When does the operator want Wave 8a to actually open? |
 | **Default** | **Open on or after 2026-06-02; exact date is operator choice.** No urgency. Per `WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md` § 10 the retrofit is in good shape and waits cleanly. |
-| **Operator approval** | `operator-must-confirm` — operator picks a specific date. |
-| **Implementation implication** | Once the date is picked, the operator runs the kickoff brief (which references this decision record + the pre-flight audit). B1 begins on the chosen date. |
+| **Operator approval** | ✅ **APPROVED** (2026-05-22) — Use the doctrinal floor date 2026-06-02 OR the first operator-approved work session after that date. No implementation before 2026-06-02. |
+| **Implementation implication** | Wave 8a kickoff brief authoring may begin any time; B1 (retrofit branch creation + commons submodule add) starts no earlier than 2026-06-02. Operator confirms the actual work-session date when ready. |
 
 ---
 
-## 13. Open decisions summary
+## 13. Final decision summary (all 12 resolved)
 
-### `operator-must-confirm` (block kickoff until answered)
+### ✅ Explicitly operator-approved (3)
 
-  2. `requirements.txt` discrepancy — does the operator know why it's missing?
-  3. CI shape — preserve `test.yml` + add `ci.yml`, OR merge into one workflow?
-  12. Wave 8a opening date
+  - **#2 `requirements.txt` discrepancy** — APPROVED 2026-05-22. Add `requirements.txt` + `requirements-dev.txt` from scratch in B1; reconcile CLAUDE.md as needed.
+  - **#3 CI shape** — APPROVED 2026-05-22. Preserve `test.yml`; add parallel family-standard `ci.yml`. Do not delete/merge the existing Ubuntu matrix workflow unless a later specific issue appears.
+  - **#12 Wave 8a opening date** — APPROVED 2026-05-22. Use doctrinal floor date 2026-06-02 OR the first operator-approved work session after that date. No implementation before 2026-06-02.
 
-### `default-accept` (silent acceptance OK)
+### ✅ Default-accepted (9)
 
-  1, 4, 5, 6, 7, 8, 9, 10, 11 — all defaults are conservative + reversible. Operator can amend at the kickoff brief stage if desired.
+  - **#1** Version: tag-skip (no version bump for facade-only retrofit)
+  - **#4** `ValveMasterTool.spec`: delete at B6 (dead code)
+  - **#5** BrandProfile: use commons `DEFAULT_BRAND` (palette byte-matches)
+  - **#6** Screenshot baseline location: `phoenix-commons/docs/ui-platform-baseline-v1/screenshots/wave-8a/`
+  - **#7** `SectionCard` retention: keep local (preserved-local per MIGRATION_RULES § 1)
+  - **#8** `_EMBEDDED_QSS` fallback: retire at B4 (commons covers fallback)
+  - **#9** Python 3.12 build venv: soft-warn at build.bat entry; not hard-fail
+  - **#10** Step 0 cleanup: full cleanup per FROZEN_BUILD_BASELINE (`rmdir /S /Q build dist`)
+  - **#11** CI matrix: retain 3.10/3.11/3.12 on `test.yml`; `ci.yml` is 3.12-only
 
 ### Summary
 
-  - **3 decisions require operator confirmation.**
-  - **9 decisions default-accept silently.**
-
-Once the 3 must-confirm decisions are answered, the kickoff brief can be authored and Wave 8a may open (on or after 2026-06-02).
+  - **12 decisions resolved.**
+  - **0 decisions blocking kickoff.**
+  - Wave 8a kickoff brief authoring may begin any time.
+  - Wave 8a implementation (B1) starts no earlier than 2026-06-02.
 
 ---
 
@@ -190,4 +198,4 @@ Once the 3 must-confirm decisions are answered, the kickoff brief can be authore
 
 ---
 
-*End of Wave 8a Kickoff Decision Record. Awaits operator answers to the 3 `operator-must-confirm` decisions before Wave 8a opens.*
+*End of Wave 8a Kickoff Decision Record. All 12 decisions resolved on 2026-05-22. Wave 8a may open on or after the 2026-06-02 doctrinal cooldown floor pending final operator go-ahead.*
