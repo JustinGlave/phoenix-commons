@@ -411,7 +411,7 @@ Per tool, the allowed visible change at retrofit time:
 |------|---------------------------|
 | Phoenix CAD | ≈ 0% (already System A) |
 | Phoenix Checkout | < 5% (theme already System A) |
-| ValveMaster | High — explicit gray→navy theme swap |
+| ValveMaster / Phoenix Master Tool | ≈ 0% (revised 2026-05-22 per `WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md`; the v1.1.0 release already shipped the System A palette in `phoenix_style.qss`. Earlier "High — gray→navy swap" prediction is superseded.) |
 | Job Tracker | < 5% (theme already System A) |
 | PCC | High during 3C-3G modernization; near 0% during any Wave-8 retrofit |
 

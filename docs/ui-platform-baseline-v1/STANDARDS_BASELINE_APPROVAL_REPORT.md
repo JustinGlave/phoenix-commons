@@ -222,7 +222,7 @@ Per Wave 8a's pre-flight requirements in `APP_STANDARDIZATION_READINESS_MATRIX.m
 | WIP isolation if needed (MIGRATION_RULES § 9) | **Pending** — TBD at kickoff |
 | Branch created from `main` at clean baseline | **Pending** — happens at kickoff |
 | Branch name follows `phase-8a-valvemaster-retrofit` convention | **Documented** |
-| Operator visual-change-band approval for grey→navy swap | **Pending** — happens at kickoff |
+| Operator visual-change-band approval (≈ 0% expected per `WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md`) | **Pending** — light review at kickoff |
 
 **Wave 8a pre-flight CAN begin** after the operator decides to open the phase (no earlier than the 2026-06-02 cooldown floor, but realistically when the operator is ready). The standards baseline + checklist + readiness matrix together provide everything the pre-flight needs to execute consistently.
 

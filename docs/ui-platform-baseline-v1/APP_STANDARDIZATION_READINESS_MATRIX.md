@@ -55,13 +55,13 @@ This matrix does NOT include deep code-level inspection of each candidate — th
 | **GitHub release zip** | `ValveMasterTool.zip` |
 | **Current `version.py`** | unknown — read at retrofit kickoff |
 | **Source files (top-level)** | `phoenix_master_pyside6.py` (main GUI), `phoenix_master_backend.py`, `inventory.py`, `assets.py`, `ValveMasterTool.spec`, `build.bat`, `installer.iss` |
-| **Visual drift** | **HIGH** — System B grey palette (`#1c1c1c`-family). Pre-PCC `BrandProfile`. Pre-Lucide chrome (likely emoji + raw QPushButton). |
+| **Visual drift** | **LOW** — **revised after pre-flight audit (2026-05-22).** v1.1.0 already shipped the System A palette in `phoenix_style.qss` (byte-match `#0a0e27` BG / `#141829` surface / DEFAULT_BRAND red+blue). The earlier "HIGH — System B grey palette" prediction is outdated; the swap was completed pre-Wave-8a. Lucide iconography + raw-QPushButton inventory pending operator review during retrofit (low expected delta). See `WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md`. |
 | **Functional drift** | **MEDIUM** — own `inventory.py` for domain data, own updater integration. Theme application via programmatic palette (no QSS file). |
 | **Commons readiness** | LOW — no `commons/` submodule, no `requirements.txt` includes `-e ./commons`, theme/widget/paths all local |
 | **Build readiness** | **HIGH** — already has `ValveMasterTool.spec` + `build.bat`. Per `OPERATIONAL_HARDENING_REPORT_01` it gained CI in 2026-05. PyInstaller present. |
 | **Packaging readiness** | MEDIUM — needs `--noupx` + stdlib excludes + Step-0 cleanup verification against `FROZEN_BUILD_BASELINE.md` |
-| **Expected retrofit risk** | **MEDIUM-HIGH** — visible theme swap (grey → navy) is the largest single visible change in any retrofit. Operator notes flag this explicitly. Domain logic (`inventory.py`) is app-specific business logic that MUST stay local |
-| **Visible-change band** | HIGH (per MIGRATION_RULES Screenshot baseline) — explicit gray→navy theme swap. Document loudly in the release note. |
+| **Expected retrofit risk** | **LOW-MEDIUM (revised)** — facade-only retrofit (theme application mechanism, updater facade, widget monolith inline-class swap per MIGRATION_RULES § 11, build hardening). Theme palette already canonical. Domain logic (`inventory.py`, `phoenix_master_backend.py`, `assets.py`) is app-specific business logic that MUST stay local. |
+| **Visible-change band** | **LOW ≈ 0% (revised, Phoenix-CAD profile)** — the v1.1.0 release already shipped the System A palette. The pre-flight audit (`WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md`) verified byte-match canonical tokens. Earlier predictions of "HIGH gray→navy swap" are outdated. Release note framing: facade retrofit, not theme swap. |
 | **Likely phase order** | **Wave 8a** (next per `MIGRATION_RULES § Migration order`) |
 | **Doctrinal cooldown floor** | **2026-06-02** (14 days after Phase 3B's 2026-05-19 merge) |
 | **Blockers before implementation** | (a) Operator approval to open the phase; (b) confirm cooldown floor cleared; (c) pre-flight gap inventory of `inventory.py` / `assets.py` symbols against commons; (d) confirm `phoenix_master_pyside6.py` theme region is cleanly separable from domain logic |
@@ -185,7 +185,7 @@ Each Wave 8x retrofit MUST complete these before opening implementation:
   4. **WIP isolation** if the tool's working tree has unfinished feature work (MIGRATION_RULES § 9).
   5. **Branch created from tool's `main`/`master` at a clean baseline.**
   6. **Branch name follows `phase-8x-<tool-slug>-retrofit` convention.**
-  7. **Operator visual-change-band approval** (especially for Wave 8a's grey→navy swap).
+  7. **Operator visual-change-band approval.** (Wave 8a: ≈ 0% expected per the pre-flight audit's byte-match verification of `phoenix_style.qss`. Light review only.)
 
 ---
 
