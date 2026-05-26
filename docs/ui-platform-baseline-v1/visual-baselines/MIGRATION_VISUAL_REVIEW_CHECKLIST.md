@@ -266,34 +266,47 @@
 - [ ] Six inline `font-family: Consolas` occurrences in PCC
       widget code addressed (per `DESIGN_SYSTEM.md` § Forbidden).
 
-### ValveMaster — System B → A cutover (Phase 8a)
+### ValveMaster / Phoenix Master Tool — Wave 8a facade retrofit
 
-This section applies only to ValveMaster's eventual retrofit
-PR. Every row here is **expected to be ⚠️ (intentional change)
-with explicit sign-off** — the whole point of the retrofit is
-to replace System B with System A.
+**Revised 2026-05-26 per `WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md`.**
+The original "System B → A cutover" framing is superseded:
+ValveMaster's `v1.1.0` release already shipped the canonical
+System A palette in `phoenix_style.qss` (byte-match verified).
+Wave 8a is therefore a **facade retrofit** (commons-backed
+architecture alignment + build hardening + updater/theme/widget
+facades), NOT a visible theme swap. Expected visible change
+≈ 0% (Phoenix-CAD profile).
 
-- [ ] `#1c1c1c` gray bg → `#0a0e27` navy bg.
-- [ ] `#487cff` blue accent → `#3b82f6` accent / `#dc2626`
-      primary as appropriate.
-- [ ] Programmatic `QPalette` setup removed; replaced with
-      `phoenix_commons.theme.apply_dark_theme`.
-- [ ] `assets.py` base64-embedded icons replaced with Lucide
-      `icon(...)` calls where appropriate; app-specific
-      valve-type icons remain app-local.
-- [ ] Inno Setup `AppId` GUID **`{{A7F3C2D1-9B4E-4F6A-8C3D-1E5B7A9F2C4D}`
+Rows below are **expected to be ✅ (parity) or, where the
+retrofit introduces a Lucide-icon substitution, ⚠️ (intentional)
+with sign-off**. The full "everything is intentional" framing
+from the original cutover section no longer applies.
+
+- [ ] Theme: `phoenix_style.qss` retired in favor of
+      `phoenix_commons.theme.apply_dark_theme(app)` via
+      `DEFAULT_BRAND` (palette tokens are byte-equal — should be
+      ✅ parity, not ⚠️).
+- [ ] Programmatic `QPalette` defaults removed if any local
+      overrides existed; commons sentinel-substitution applies.
+- [ ] `assets.py` base64-embedded brand assets remain local
+      (PyInstaller bundles via module scan — preserve-local
+      per pre-flight audit § preserved-local domain logic).
+      Lucide substitution allowed for chrome icons where
+      appropriate; valve-type domain icons remain app-local.
+- [ ] Inno Setup `AppId` GUID **`{A7F3C2D1-9B4E-4F6A-8C3D-1E5B7A9F2C4D}`
       preserved byte-for-byte** — critical for Windows upgrade
       detection.
-- [ ] `apply_light_theme()` removed (Phoenix is dark-only;
-      ADR-011).
-- [ ] Release note explicit about the visual change: "ValveMaster
-      now matches the Phoenix dark navy chrome shipping with
-      Lab Layout Tool / Project Tracking Tool."
-- [ ] First post-retrofit screenshot run **before merge** to
-      establish the new ValveMaster baseline.
-- [ ] User-visible release note: "ValveMaster has been updated
-      to match the Phoenix design system. The look has changed
-      intentionally."
+- [ ] `apply_light_theme()` removed if present (Phoenix is
+      dark-only; ADR-011).
+- [ ] Release note framing: **facade retrofit**, ≈ 0% visible
+      change. Reference `WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md`
+      and `WAVE_8A_IMPLEMENTATION_BRIEF.md` in the PR description.
+- [ ] Light visual review at merge gate (per operator decision
+      2026-05-22) — full Phase 2.7-style baseline is not required
+      because the canonical palette already shipped at `v1.1.0`.
+- [ ] No user-visible "the look has changed" release note. If
+      anything observable did shift (e.g. a Lucide-icon swap),
+      document it surgically in the changelog.
 
 ## Final sign-off
 

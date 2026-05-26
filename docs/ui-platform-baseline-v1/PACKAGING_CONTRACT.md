@@ -157,7 +157,7 @@ Existing user data is preserved across upgrade
 Upgrade from prior installed release works on a real machine
 For Phoenix CAD: cad/ subsystem + BricsCAD COM untouched
 For Job Tracker: starter_package/ deletion in same PR
-For ValveMaster: theme swap explicitly noted in release notes
+For ValveMaster / Phoenix Master Tool: facade retrofit (≈ 0% visible change per WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT) — AppId GUID {A7F3C2D1-9B4E-4F6A-8C3D-1E5B7A9F2C4D} preserved byte-for-byte
 ```
 
 A retrofit PR that fails any checklist item must not merge. The

@@ -41,9 +41,11 @@ Examples:
 ## Summary
 
 One paragraph: which tool, what changes, what's the visible impact.
-For tools already on System A, the visible impact is "≈ 0%"; for
-ValveMaster, it's "explicit System B → A theme swap — see release
-notes."
+For tools already on System A (Phoenix CAD, Phoenix Checkout,
+ValveMaster / Phoenix Master Tool — see WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT
+for the byte-match verification), the visible impact is "≈ 0%". For
+any future tool not yet on System A, document the visible delta
+explicitly and capture before/after screenshots.
 
 ## Pre-flight state
 

@@ -61,32 +61,30 @@ either lookup resolves:
 
 ## Apps not represented as subdirectories
 
-### ValveMasterTool
+### ValveMasterTool / Phoenix Master Tool
 
-ValveMaster is the lone production tool that runs on **System B**
-— the deprecated `#1c1c1c` gray palette set programmatically via
-`QPalette` (no QSS file). It's explicitly slated for a System A
-retrofit in Phase 8a, at which point its entire visual identity
-shifts.
+**Status revised 2026-05-26 per `WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md`.**
+ValveMaster's `v1.1.0` release already shipped the canonical
+System A palette in `phoenix_style.qss` (byte-match verified:
+BG `#0a0e27`, surface `#141829`, primary `#dc2626`, secondary
+`#1e3a8a`, accent `#3b82f6`). The earlier characterization of
+ValveMaster as a "System B" tool (deprecated `#1c1c1c` gray
+`QPalette`) is **superseded**. Wave 8a is a facade retrofit
+(commons-backed architecture alignment + build hardening +
+updater/theme/widget facades) — NOT a visible theme swap.
+Expected visible change ≈ 0% (Phoenix-CAD profile).
 
-A pre-migration baseline of ValveMaster's gray surfaces would
-mostly capture surfaces that are intentionally being replaced.
-Rather than carry a 1-phase-lifetime baseline doc, ValveMaster's
-visual debt and the System B → A migration risks are documented
-in:
+A Phase 2.7-style pre-migration baseline was never captured
+because the original framing assumed the surfaces would be
+intentionally replaced. The revised assessment means a baseline
+COULD be captured before Wave 8a opens, but the operator's
+2026-05-22 decision is "light visual review at the merge gate"
+rather than a full Phase 2.7-style baseline.
 
-- `VISUAL_BASELINE_RULES.md` § "Non-canonical baselines" — the
-  policy for tools mid-migration off System B.
-- `MIGRATION_VISUAL_REVIEW_CHECKLIST.md` § "System B → A
-  cutover" — the additional checklist rows that apply only to
-  ValveMaster's retrofit PR.
-- `STABILIZATION_REPORT_06.md` § "Apps most likely to regress
-  visually" — ValveMaster is the #1 candidate.
-
-When ValveMaster's Phase 8a retrofit starts, a fresh
-`valvemaster/baseline.md` should be captured at that retrofit's
-PR-open time. The "before" snapshot will be the System B state;
-the "after" expectation is parity with the rest of System A.
+When Wave 8a's retrofit lands (on or after 2026-06-02), a fresh
+`valvemaster/baseline.md` may be captured at PR-close time to
+seed any future visual-regression review for Phoenix Master Tool.
+The "before" and "after" snapshots are expected to be ≈ 0% diff.
 
 ## Reading the per-app baselines
 

@@ -9,9 +9,13 @@
 
 A retrofit (Phase 3A onwards) replaces an app's local theme +
 widgets with the commons equivalents. The retrofit is supposed
-to be **visually neutral** for the apps already on System A
-(Phoenix CAD, Job Tracker, Phoenix Checkout) and a **deliberate
-visual upgrade** for ValveMaster (System B → A).
+to be **visually neutral** for every production tool already
+shipping on System A — Phoenix CAD, Job Tracker, Phoenix Checkout,
+**and ValveMaster / Phoenix Master Tool** (`v1.1.0` already shipped
+the canonical System A palette in `phoenix_style.qss`; the
+`WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md` byte-match verification
+deflated the earlier "System B → A" prediction. Expected visible
+change ≈ 0%, Phoenix-CAD profile).
 
 Without a captured reference, "visually neutral" devolves into
 "looks fine to me" — and small drifts pile up. Baselines are
@@ -241,14 +245,19 @@ this gate:
 
 Examples of changes that always require explicit sign-off:
 
-- ValveMaster's System B → A palette swap (intentional — it's
-  the whole point of the retrofit).
 - Any change in font family (e.g. dropping a bundled font in
   favour of system Segoe UI — would change kerning slightly).
 - Any change in primary/secondary semantics (e.g. promoting a
   button tier).
 - Replacement of an emoji icon with a Lucide SVG (different
   glyph shape; acceptable per `ICON_POLICY.md` but visible).
+- Any future tool that arrives on a non-canonical palette and
+  is retrofitted to System A. (No production tool currently
+  matches this case — ValveMaster's `v1.1.0` release already
+  shipped the canonical palette per
+  `WAVE_8A_VALVEMASTER_PREFLIGHT_AUDIT.md`. The earlier
+  "ValveMaster System B → A palette swap" example was retired
+  on 2026-05-26.)
 
 ## When baselines update
 
