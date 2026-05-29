@@ -131,22 +131,26 @@ This is **strong functional evidence** that:
 
 **No build-time quarantine observed.** All 5 artifacts persisted from creation through validation. PyInstaller's bootloader was not flagged during compilation; Inno Setup output unflagged; both zips wrote successfully.
 
-**5-minute idle interactive S1 observation — deferred to operator.** Requires operator to launch installed exe on interactive desktop, sit idle 5 min, watch for quarantine pop / process kill / relaunch cycle. Per canonical Phase 6 / FROZEN_BUILD_BASELINE protocol.
+**5-minute interactive S1 observation — ✅ PASSED (operator-confirmed 2026-05-28).** Operator launched `dist\ProjectTrackingTool\ProjectTrackingTool.exe` on interactive desktop and observed for 5 minutes:
+
+- Process stayed alive throughout the window
+- Exe remained on disk (no Crowdstrike S1 quarantine)
+- No crash
+- No kill / relaunch cycle
+- No missing resources
 
 ---
 
 ## 9. Operator visual review result
 
-**Deferred to operator.** Surfaces to walk:
+**✅ PASSED (operator-confirmed 2026-05-28).** Operator interactive observation:
 
-- Main window — project list + task table renders correctly
-- Financials dashboard / dialog — Excel data displays + UI controls render
-- Login dialog / user-management — auth flow renders
-- Change-order window / notes window / RSS dialogs — secondary UIs render
-- StatCard tiles, badges (Pass/Fail/Archived), resize handles, task-tools dropdown — app-specific selectors present
-- UpdateBanner — commons signature ("Release Notes" text, no 🆕 emoji) acceptable
+- Visual change ≈ 0%
+- Buttons / tables / theme rendered correctly
+- Financials surfaces showed no obvious launch-time regression
+- Auth surfaces showed no obvious launch-time regression
 
-**Offscreen evidence available now:**
+**Offscreen evidence also available:**
 - Frozen exe constructs and runs (5-sec liveness ✅)
 - financials_excel functional (data load + persistence proven via log)
 - No DLL-missing / module-missing startup crash
