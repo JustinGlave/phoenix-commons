@@ -331,16 +331,38 @@ This document is the plan only. Execution requires operator approval per step.
 
 ---
 
-## Awaiting operator decision before execution
+## Operator decisions — APPROVED 2026-05-29
 
-1. **Version-bump policy**: patch-bump all 4 (recommended) vs hold versions steady?
-2. **Tag-promotion policy**: re-tag in place (a) vs keep `-rc1` as forensic (b — recommended)?
-3. **Bake window length**: 1 day / 1 week / operator-discretion?
-4. **Build order confirmation**: CAD → Checkout → ValveMaster → Job Tracker (matches your direction)?
-5. **Asset upload trigger**: upload to GitHub Release draft immediately after each RC build, or wait until all 4 RC builds are baked?
+| # | Decision | Resolution |
+|---|----------|------------|
+| 1 | Version-bump policy | ✅ **APPROVED — patch-bump all 4.** CAD → `v0.1.2-rc1`, Checkout → `v1.7.1-rc1`, ValveMaster → `v1.1.1-rc1`, Job Tracker → `v1.8.6-rc1` |
+| 2 | Tag-promotion policy | ✅ **APPROVED — keep `-rc1` tags immutable as forensic markers.** Do NOT re-tag in place. If RC passes bake, create final stable tags as separate annotated tags at the same merge-commit SHA. |
+| 3 | Bake window | ✅ **APPROVED — 1-day minimum per RC.** Operator may extend by discretion if issues appear. |
+| 4 | Build order | ✅ **APPROVED — CAD → Checkout → ValveMaster → Job Tracker.** |
+| 5 | Asset upload trigger | ✅ **APPROVED — wait until all 4 RC builds pass before uploading release assets.** Draft release notes may be prepared earlier; no GitHub Release asset upload until the full 4-app RC set is validated. |
 
-Once these 5 decisions are confirmed, RC execution can begin. Until then, no RC work happens.
+All 5 decisions resolved. RC execution unblocked.
+
+### Execution ordering reminder (Decision #4 + Decision #5 combined)
+
+```
+For tool in [CAD, Checkout, ValveMaster, Job Tracker]:
+    1. Merge hardening branch to mainline (CAD + Checkout only — VM + JT already merged)
+    2. Bump version.py + README + CHANGELOG (this commit becomes the RC HEAD)
+    3. Create release/v<X.Y.Z>-rc1 branch
+    4. Create annotated `v<X.Y.Z>-rc1` tag on that commit
+    5. Push branch + tag
+    6. Build artifacts (`build.bat`)
+    7. Operator interactive validation (5-min S1 + visual; xlsx round-trip for Checkout; upgrade smoke from prior install)
+    8. Minimum 1-day bake (Decision #3)
+
+After ALL 4 RCs pass bake (Decision #5):
+    9. Draft GitHub Release per tool (description + version metadata; assets NOT uploaded yet)
+    10. Upload installer + updater zip to each draft (in CAD → Checkout → VM → JT order)
+    11. Final operator approval to publish each release
+    12. Create final stable tags (`v0.1.2`, `v1.7.1`, `v1.1.1`, `v1.8.6`) — separate annotated tags at the same SHA as the `-rc1` tags (Decision #2)
+```
 
 ---
 
-*End of Phoenix 4-app RC release plan. No builds, no tags, no releases until operator gives the go-ahead per decision.*
+*End of Phoenix 4-app RC release plan. All 5 decisions resolved 2026-05-29. RC execution awaits operator kickoff signal.*
