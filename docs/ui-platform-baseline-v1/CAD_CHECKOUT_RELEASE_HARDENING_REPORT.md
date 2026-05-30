@@ -84,6 +84,22 @@ Preserved verbatim:
 | Inno Setup compilation | succeeded (29.61 sec) |
 | 5-min interactive S1 + operator visual | **deferred to operator** |
 
+### Post-publication fix (2026-05-29)
+
+A follow-up offscreen frozen-exe launch smoke surfaced a Checkout-only crash on startup: `ModuleNotFoundError: No module named 'openpyxl'` at `checkout_export.py:18`. Root cause: `requirements.txt` did not declare `openpyxl` (despite the code using it), and `build.bat` had no `--hidden-import=openpyxl`. Prior releases worked only because the operator's pre-existing venv had openpyxl installed via another path.
+
+Fix committed at `9b638cb` (additional commit on the same hardening branch):
+- `requirements.txt`: `+ openpyxl==3.1.5` (family-canonical pin)
+- `build.bat`: `+ --hidden-import=openpyxl`, `+ --hidden-import=openpyxl.cell._writer`, `+ --collect-submodules=openpyxl`
+
+Re-validation:
+- ✅ build.bat end-to-end DONE
+- ✅ Frozen exe offscreen launch: **EXIT 0, no traceback** (was: ModuleNotFoundError)
+- ✅ openpyxl bundled (via PYZ archive); import path validated by clean launch
+- ✅ Updater zip contract still exe-only (1 entry, `['PhoenixCheckoutTool.exe']`)
+
+No other contract changed.
+
 ---
 
 ## 5. Contracts preserved
