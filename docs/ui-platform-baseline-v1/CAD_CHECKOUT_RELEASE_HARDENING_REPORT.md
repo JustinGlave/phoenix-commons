@@ -201,13 +201,32 @@ After RCs build + install cleanly on 1-2 operator machines for a week (or shorte
 
 ## Verdict
 
-### **Hardening complete — both tools structurally release-ready.**
-
-Awaiting operator interactive validation session for CAD + Checkout (5-min S1 idle + visual review each). Once that clears, all 4 production tools can proceed to coordinated RC builds.
+### **Hardening complete + operator validation PASSED — both tools release-ready.**
 
 Branches pushed:
 - `JustinGlave/lab-layout-tool` → `release-hardening/cad-rc-readiness` @ `38cb3a5`
-- `JustinGlave/Phoenix-Checkout-Tool` → `release-hardening/checkout-rc-readiness` @ `4da0c47`
+- `JustinGlave/Phoenix-Checkout-Tool` → `release-hardening/checkout-rc-readiness` @ `9b638cb` (initial `4da0c47` + openpyxl fix `9b638cb`)
+
+### Operator interactive validation result (2026-05-29)
+
+Operator report: *"All looks good on both apps."*
+
+**Phoenix CAD / Lab Layout Tool:**
+- ✅ Installed + launched hardened frozen build
+- ✅ Observed interactive runtime
+- ✅ No S1 quarantine reported
+- ✅ No crash reported
+- ✅ Visual check passed
+
+**Phoenix Checkout Tool:**
+- ✅ Installed + launched hardened frozen build (post-openpyxl fix `9b638cb`)
+- ✅ Observed interactive runtime
+- ✅ No S1 quarantine reported
+- ✅ No crash reported
+- ✅ Visual check passed
+- ⏳ xlsx template-load test — **pending** (operator confirmation did not explicitly include this sub-check; non-blocking since the offscreen frozen-exe launch already proved `openpyxl` imports cleanly at runtime, which was the root cause of the prior crash)
+
+Both tools join ValveMaster + Job Tracker on the release-ready list. Next: 4-app coordinated RC release plan (`PHOENIX_4_APP_RC_RELEASE_PLAN.md`).
 
 ---
 

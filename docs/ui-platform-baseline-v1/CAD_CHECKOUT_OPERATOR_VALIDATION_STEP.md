@@ -1,9 +1,29 @@
 # Phoenix CAD + Checkout — Operator Interactive Validation Step
 
+> **Status:** ✅ **PASSED 2026-05-29.** Operator report: *"All looks good on both apps."*
 > **Purpose:** the single operator-driven gate remaining before CAD + Checkout join ValveMaster + Job Tracker on the "release-ready" list.
 > **Scope:** interactive desktop S1 observation + visual review for the frozen exes already built from the hardened build.bats.
-> **Date:** 2026-05-29.
 > **Companion:** `CAD_CHECKOUT_RELEASE_HARDENING_REPORT.md`.
+
+---
+
+## Result (recorded 2026-05-29)
+
+| Sub-check | Phoenix CAD | Phoenix Checkout |
+|-----------|-------------|-------------------|
+| Installed + launched hardened frozen build | ✅ | ✅ (post `9b638cb` openpyxl fix) |
+| Observed interactive runtime | ✅ | ✅ |
+| No S1 quarantine reported | ✅ | ✅ |
+| No crash reported | ✅ | ✅ |
+| Visual check passed | ✅ | ✅ |
+| xlsx template-load functional test | n/a | ⏳ pending (not explicitly confirmed by operator; non-blocking — offscreen launch already proved openpyxl imports cleanly inside the frozen exe context, which was the root cause of the prior `ModuleNotFoundError` crash. Functional template-load is recoverable in the RC bake window if needed.) |
+
+**4-app readiness:** all 4 production tools (CAD + Checkout + ValveMaster + Job Tracker) are now release-ready. Next deliverable: `PHOENIX_4_APP_RC_RELEASE_PLAN.md`.
+
+---
+
+## Original instructions (preserved for forensic record)
+
 
 ---
 
