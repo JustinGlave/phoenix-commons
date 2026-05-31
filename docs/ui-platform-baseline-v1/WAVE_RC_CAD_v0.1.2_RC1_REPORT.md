@@ -1,6 +1,6 @@
 # Phoenix CAD / Lab Layout Tool — v0.1.2-rc1 Report
 
-> **Status:** RC built, tagged, pushed. **Operator interactive validation ✅ PASSED 2026-05-30.** Baking until 2026-05-31 22:00 local.
+> **Status:** RC built, tagged, pushed. **Operator interactive validation ✅ PASSED 2026-05-30.** Bake windows waived 2026-05-30; Checkout RC proceeds immediately.
 > **Date:** 2026-05-30.
 > **Repo:** `JustinGlave/lab-layout-tool`.
 
@@ -127,15 +127,11 @@ If operator validation fails, halt the 4-app RC sequence and triage.
 
 ## 10. Bake start time
 
-**Bake clock starts at the build completion timestamp: 2026-05-30 22:00 (local).**
-
-(Per Decision #3 — bake begins when the RC artifacts exist on disk. Operator validation can happen during the bake window.)
+**Bake clock started 2026-05-30 22:00 local** (build completion). **Operator waived bake windows 2026-05-30.** RC progression proceeds after successful operator validation.
 
 ## 11. Earliest Checkout RC start time
 
-**Earliest: 2026-05-31 22:00 (local)** — 1-day minimum bake from CAD build completion.
-
-Operator may extend by discretion (Decision #3) if any issue appears during CAD bake.
+**Now** — Checkout RC kicked off immediately after CAD operator validation passed, per the bake waiver.
 
 ## 12. Confirmation
 

@@ -11,7 +11,7 @@
 |---|----------|------------|
 | 1 | Version bump | Patch-bump all 4: `v0.1.2-rc1` / `v1.7.1-rc1` / `v1.1.1-rc1` / `v1.8.6-rc1` |
 | 2 | Tag promotion | Keep `-rc1` immutable; create final stable tags as separate annotated tags at the same SHA after bake |
-| 3 | Bake window | 1-day minimum per RC (operator may extend) |
+| 3 | Bake window | **WAIVED 2026-05-30.** RC progression proceeds after successful operator validation. |
 | 4 | Build order | CAD → Checkout → ValveMaster → Job Tracker |
 | 5 | Asset upload | Wait until all 4 RC builds pass before uploading GitHub Release assets |
 

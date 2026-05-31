@@ -337,7 +337,7 @@ This document is the plan only. Execution requires operator approval per step.
 |---|----------|------------|
 | 1 | Version-bump policy | ✅ **APPROVED — patch-bump all 4.** CAD → `v0.1.2-rc1`, Checkout → `v1.7.1-rc1`, ValveMaster → `v1.1.1-rc1`, Job Tracker → `v1.8.6-rc1` |
 | 2 | Tag-promotion policy | ✅ **APPROVED — keep `-rc1` tags immutable as forensic markers.** Do NOT re-tag in place. If RC passes bake, create final stable tags as separate annotated tags at the same merge-commit SHA. |
-| 3 | Bake window | ✅ **APPROVED — 1-day minimum per RC.** Operator may extend by discretion if issues appear. |
+| 3 | Bake window | ✅ **APPROVED 2026-05-29 — 1-day minimum per RC.** ⚠️ **WAIVED 2026-05-30** — Operator waived bake windows. RC progression proceeds after successful operator validation. |
 | 4 | Build order | ✅ **APPROVED — CAD → Checkout → ValveMaster → Job Tracker.** |
 | 5 | Asset upload trigger | ✅ **APPROVED — wait until all 4 RC builds pass before uploading release assets.** Draft release notes may be prepared earlier; no GitHub Release asset upload until the full 4-app RC set is validated. |
 
@@ -354,9 +354,9 @@ For tool in [CAD, Checkout, ValveMaster, Job Tracker]:
     5. Push branch + tag
     6. Build artifacts (`build.bat`)
     7. Operator interactive validation (5-min S1 + visual; xlsx round-trip for Checkout; upgrade smoke from prior install)
-    8. Minimum 1-day bake (Decision #3)
+    8. Bake windows waived — proceed immediately to next app on operator validation pass (Decision #3 revised 2026-05-30)
 
-After ALL 4 RCs pass bake (Decision #5):
+After ALL 4 RCs pass operator validation (Decision #5):
     9. Draft GitHub Release per tool (description + version metadata; assets NOT uploaded yet)
     10. Upload installer + updater zip to each draft (in CAD → Checkout → VM → JT order)
     11. Final operator approval to publish each release
