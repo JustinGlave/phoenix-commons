@@ -1,6 +1,6 @@
 # Phoenix Checkout Tool — v1.7.1-rc1 Report
 
-> **Status:** RC built, tagged, pushed. Awaiting operator interactive validation.
+> **Status:** RC built, tagged, pushed. **Operator interactive validation ✅ PASSED 2026-05-30** (including xlsx template-load end-to-end). ValveMaster v1.1.1-rc1 kicked off immediately per bake waiver.
 > **Date:** 2026-05-30.
 > **Repo:** `JustinGlave/Phoenix-Checkout-Tool`.
 
@@ -88,9 +88,20 @@ Runtime verification: offscreen frozen-exe launch (`QT_QPA_PLATFORM=offscreen ti
 
 ## 10. Operator validation status
 
-**⏳ Awaiting operator interactive validation.**
+**✅ PASSED 2026-05-30** (recorded after operator interactive run).
 
-### Validation instructions for operator
+Operator-observed gates:
+- ✅ Installed from `dist\PhoenixCheckoutToolSetup.exe`
+- ✅ Launched installed `PhoenixCheckoutTool.exe`
+- ✅ 5-minute S1 observation — no quarantine, no kill / relaunch cycle
+- ✅ No crash; exe remained on disk
+- ✅ Visual review passed
+- ✅ Checkout form rendered
+- ✅ **xlsx template load worked** — confirms the openpyxl runtime fix end-to-end (the gap that was pending in Wave 8b is now closed)
+
+No issues observed. Checkout RC clears.
+
+### Validation instructions for operator (original, preserved for forensic record)
 
 ```
 1. Install:
