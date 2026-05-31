@@ -1,6 +1,6 @@
 # Phoenix CAD / Lab Layout Tool — v0.1.2-rc1 Report
 
-> **Status:** RC built, tagged, pushed. Awaiting operator interactive validation + 1-day bake.
+> **Status:** RC built, tagged, pushed. **Operator interactive validation ✅ PASSED 2026-05-30.** Baking until 2026-05-31 22:00 local.
 > **Date:** 2026-05-30.
 > **Repo:** `JustinGlave/lab-layout-tool`.
 
@@ -72,9 +72,22 @@ Matches the Phase 3A precedent: Phoenix CAD updater zip ships the full folder (e
 
 ## 8. Operator validation status
 
-**⏳ Awaiting operator interactive validation.**
+**✅ PASSED 2026-05-30** (recorded after operator interactive run).
 
-### Validation instructions for operator
+Operator-observed gates:
+- ✅ Installed from `dist\LabLayoutToolSetup.exe`
+- ✅ Launched installed `LabLayoutTool.exe`
+- ✅ 5-minute S1 observation — no quarantine, no kill / relaunch cycle
+- ✅ No crash; exe remained on disk
+- ✅ Visual review passed
+- ✅ Main window opened
+- ✅ Parts catalog loaded
+- ✅ Layout canvas rendered
+- ✅ BricsCAD integration buttons visible
+
+No issues observed. CAD RC clears into the bake window.
+
+### Validation instructions for operator (original, preserved for forensic record)
 
 ```
 1. Install:
