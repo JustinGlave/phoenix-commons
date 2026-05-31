@@ -1,6 +1,6 @@
 # ValveMaster / Phoenix Master Tool — v1.1.1-rc1 Report
 
-> **Status:** RC built, tagged, pushed. Awaiting operator interactive validation.
+> **Status:** RC built, tagged, pushed. **Operator interactive validation ✅ PASSED 2026-05-30.** Job Tracker v1.8.6-rc1 kicked off immediately.
 > **Date:** 2026-05-30.
 > **Repo:** `JustinGlave/phoenix-master-tool`.
 
@@ -88,9 +88,20 @@ installer.iss line 11: AppId={{A7F3C2D1-9B4E-4F6A-8C3D-1E5B7A9F2C4D}
 
 ## 11. Operator validation status
 
-**⏳ Awaiting operator interactive validation.**
+**✅ PASSED 2026-05-30** (recorded after operator interactive run).
 
-### Validation instructions for operator
+Operator-observed gates:
+- ✅ Installed from `dist\PhoenixMasterToolSetup.exe`
+- ✅ Launched installed `PhoenixMasterTool.exe`
+- ✅ No S1 quarantine
+- ✅ No crash; exe remained on disk
+- ✅ Visual review passed
+- ✅ **Decoded Fields valid/invalid coloring still correct** (Wave 8a B8a fix preserved end-to-end)
+- ✅ Main validation workflow looked normal
+
+No issues observed. VM RC clears.
+
+### Validation instructions for operator (original, preserved for forensic record)
 
 ```
 1. Install:
