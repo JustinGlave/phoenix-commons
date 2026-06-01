@@ -1,6 +1,6 @@
 # Job Tracker / Project Tracking Tool — v1.8.6-rc1 Report
 
-> **Status:** RC built, tagged, pushed. Awaiting operator interactive validation. **Final RC in the 4-app sequence.**
+> **Status:** RC built, tagged, pushed. **Operator interactive validation ✅ PASSED 2026-05-31.** Final RC in the 4-app sequence — all 4 RCs are now validated.
 > **Date:** 2026-05-31.
 > **Repo:** `JustinGlave/project-tracking-tool`.
 
@@ -87,9 +87,21 @@ Matches the Wave 8b contract: Job Tracker updater zip ships the full folder (exe
 
 ## 9. Operator validation status
 
-**⏳ Awaiting operator interactive validation.**
+**✅ PASSED 2026-05-31** (recorded after operator interactive run).
 
-### Validation instructions for operator
+Operator-observed gates:
+- ✅ Installed from `dist\ProjectTrackingToolSetup.exe`
+- ✅ Launched installed `ProjectTrackingTool.exe`
+- ✅ 5-minute S1 observation — no quarantine, no kill / relaunch cycle
+- ✅ No crash; exe remained on disk
+- ✅ Visual review passed
+- ✅ Main project list opened
+- ✅ Financials / auth surfaces showed no obvious launch-time regression
+- ✅ No Excel / openpyxl / pyxlsb / reportlab missing-dependency errors
+
+No issues observed. Job Tracker RC clears. **All 4 RCs in the sequence are now operator-validated.**
+
+### Validation instructions for operator (original, preserved for forensic record)
 
 ```
 1. Install:
