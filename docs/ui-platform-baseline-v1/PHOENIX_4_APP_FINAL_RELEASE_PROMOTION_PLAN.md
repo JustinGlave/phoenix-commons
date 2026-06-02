@@ -1,6 +1,8 @@
 # Phoenix Family — 4-App Final Release Promotion Plan
 
-> **Status:** plan only — no tags created, no releases published, no assets uploaded in this document.
+> **✅ EXECUTED + SUPERSEDED 2026-06-01.** This plan was carried out in full: stable tags created, drafts authored, assets uploaded, and **all 4 releases published**. Current canonical state is `PHOENIX_4_APP_RELEASE_CLOSURE_REPORT.md`. The forward-looking "no releases published / releases remain drafts" language below reflects the plan's state-at-authoring (2026-05-31) and is retained for forensic record only — it no longer describes current reality.
+>
+> **Status (at authoring):** plan only — no tags created, no releases published, no assets uploaded in this document.
 > **Date:** 2026-05-31.
 > **Scope:** promote validated RCs (`-rc1`) to final stable releases for all 4 production tools.
 > **Companions:** `PHOENIX_4_APP_RC_RELEASE_PLAN.md`, `PHOENIX_4_APP_RC_VALIDATION_SUMMARY.md`, per-RC reports.
